@@ -190,17 +190,17 @@ export default function Home() {
         </p>
 
         <section className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <article className="rounded-[36px] bg-[#eef4ff] p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#dfe9fb]">
+          <article className="rounded-[36px] bg-[#eef4ff] p-5 md:p-6 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#cdddf7]">
             <p className="text-xs text-slate-500">Total TVL</p>
             <p className="mt-1 text-2xl md:text-3xl font-bold">{formatMoney(totalTvl)}</p>
             <p className="mt-2 text-xs text-slate-400">Perp DEX aggregate · DefiLlama</p>
           </article>
-          <article className="rounded-[36px] bg-[#f2efff] p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#e6defd]">
+          <article className="rounded-[36px] bg-[#f2efff] p-5 md:p-6 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd1fb]">
             <p className="text-xs text-slate-500">Avg 24H Move (DEX)</p>
             <p className={`mt-1 text-2xl md:text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
             <p className="mt-2 text-xs text-slate-400">평균 1일 변화율</p>
           </article>
-          <article className="rounded-[36px] bg-[#eefbf3] p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#d9f3e4]">
+          <article className="rounded-[36px] bg-[#eefbf3] p-5 md:p-6 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#c9eecf]">
             <p className="text-xs text-slate-500">Top DEX by TVL</p>
             <p className="mt-1 text-2xl md:text-3xl font-bold">{topDex?.name ?? '-'}</p>
             <p className="mt-2 text-xs text-slate-400">{topDex ? formatMoney(topDex.tvl) : '-'}</p>
@@ -209,8 +209,8 @@ export default function Home() {
 
         {error && <div className="mt-4 rounded-[28px] bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
 
-        <section className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <div className="lg:col-span-2 rounded-[36px] bg-[#f7f4ff] p-5 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#ece5fb]">
+        <section className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-5">
+          <div className="lg:col-span-2 rounded-[36px] bg-[#f7f4ff] p-5 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd3fa]">
             <div className="mb-3 flex items-end justify-between">
               <h2 className="text-xl font-bold">Perp DEX 랭킹</h2>
               <span className="text-xs text-slate-400">TVL / 1D / 7D</span>
@@ -218,7 +218,7 @@ export default function Home() {
             <div className="space-y-2">
               {loading && [1, 2, 3].map((n) => <div key={n} className="h-16 rounded-[28px] bg-slate-100 animate-pulse" />)}
               {!loading && dexRows.map((r, i) => (
-                <article key={r.slug} className="rounded-[28px] bg-[#f7f9fc] px-3 py-3">
+                <article key={r.slug} className="rounded-[28px] bg-white px-3 py-3 border border-[#e7edf5] shadow-[0_2px_8px_rgba(15,23,42,0.06)]">
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <p className="text-xs text-slate-400">#{i + 1}</p>
@@ -235,7 +235,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-3 rounded-[36px] bg-[#f7fbff] p-5 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#e2eefb]">
+          <div className="lg:col-span-3 rounded-[36px] bg-[#f7fbff] p-5 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#d1e3f8]">
             <div className="mb-3 flex items-end justify-between">
               <h2 className="text-xl font-bold">코인 마켓 스냅샷</h2>
               <span className="text-xs text-slate-400">CMC + CoinGecko</span>
@@ -254,7 +254,7 @@ export default function Home() {
                 </thead>
                 <tbody>
                   {coinRows.map((c) => (
-                    <tr key={c.id} className="border-b border-slate-50">
+                    <tr key={c.id} className="border-b border-[#e8edf4]">
                       <td className="py-2.5">
                         <p className="font-semibold leading-4">{c.name}</p>
                         <p className="text-xs text-slate-400">{c.symbol}</p>
