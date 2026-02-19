@@ -177,7 +177,7 @@ export default function Home() {
   const topDex = dexRows[0];
 
   return (
-    <main className="min-h-screen bg-[#f6f8fb] text-[#22262f]">
+    <main className="min-h-screen bg-[#f3f6fb] text-[#22262f]">
       <div className="mx-auto w-full max-w-[1100px] px-4 py-6 md:px-6 md:py-10">
         <p className="text-sm font-semibold text-[#4b7bec]">Perp Pulse · Market Console</p>
         <h1 className="mt-3 text-3xl md:text-5xl font-bold leading-tight tracking-tight">
@@ -190,17 +190,17 @@ export default function Home() {
         </p>
 
         <section className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <article className="rounded-[36px] bg-white p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#edf1f5]">
+          <article className="rounded-[36px] bg-[#eef4ff] p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#dfe9fb]">
             <p className="text-xs text-slate-500">Total TVL</p>
             <p className="mt-1 text-2xl md:text-3xl font-bold">{formatMoney(totalTvl)}</p>
             <p className="mt-2 text-xs text-slate-400">Perp DEX aggregate · DefiLlama</p>
           </article>
-          <article className="rounded-[36px] bg-white p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#edf1f5]">
+          <article className="rounded-[36px] bg-[#f2efff] p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#e6defd]">
             <p className="text-xs text-slate-500">Avg 24H Move (DEX)</p>
             <p className={`mt-1 text-2xl md:text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
             <p className="mt-2 text-xs text-slate-400">평균 1일 변화율</p>
           </article>
-          <article className="rounded-[36px] bg-white p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#edf1f5]">
+          <article className="rounded-[36px] bg-[#eefbf3] p-5 md:p-6 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#d9f3e4]">
             <p className="text-xs text-slate-500">Top DEX by TVL</p>
             <p className="mt-1 text-2xl md:text-3xl font-bold">{topDex?.name ?? '-'}</p>
             <p className="mt-2 text-xs text-slate-400">{topDex ? formatMoney(topDex.tvl) : '-'}</p>
@@ -210,7 +210,7 @@ export default function Home() {
         {error && <div className="mt-4 rounded-[28px] bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
 
         <section className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <div className="lg:col-span-2 rounded-[36px] bg-white p-5 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#edf1f5]">
+          <div className="lg:col-span-2 rounded-[36px] bg-[#f7f4ff] p-5 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#ece5fb]">
             <div className="mb-3 flex items-end justify-between">
               <h2 className="text-xl font-bold">Perp DEX 랭킹</h2>
               <span className="text-xs text-slate-400">TVL / 1D / 7D</span>
@@ -235,7 +235,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-3 rounded-[36px] bg-white p-5 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#edf1f5]">
+          <div className="lg:col-span-3 rounded-[36px] bg-[#f7fbff] p-5 shadow-[0_1px_8px_rgba(15,23,42,0.05)] border border-[#e2eefb]">
             <div className="mb-3 flex items-end justify-between">
               <h2 className="text-xl font-bold">코인 마켓 스냅샷</h2>
               <span className="text-xs text-slate-400">CMC + CoinGecko</span>
