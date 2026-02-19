@@ -28,14 +28,10 @@ function toNumber(value: unknown): number {
     const n = Number(value);
     if (Number.isFinite(n)) return n;
   }
-  if (value && typeof value === 'object') {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
     const obj = value as Record<string, unknown>;
     for (const key of ['tvl', 'totalLiquidityUSD', 'usd', 'value', 'amount']) {
       const n = toNumber(obj[key]);
-      if (n > 0) return n;
-    }
-    for (const v of Object.values(obj)) {
-      const n = toNumber(v);
       if (n > 0) return n;
     }
   }
@@ -63,6 +59,14 @@ function normalizeHistorical(input: unknown): HistoricalPoint[] {
       return { date, totalLiquidityUSD };
     })
     .filter((d) => d.date > 0 && d.totalLiquidityUSD >= 0);
+}
+
+function getLatestTvl(raw: unknown): number {
+  if (Array.isArray(raw)) {
+    const hist = normalizeHistorical(raw);
+    return hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
+  }
+  return toNumber(raw);
 }
 
 function formatMoney(v: number): string {
@@ -103,15 +107,19 @@ export default function Home() {
             const protocol = response.data as Record<string, unknown>;
             const chainTvls = normalizeChainTvls(protocol.currentChainTvls);
             const firstChain = Object.keys(chainTvls)[0];
-            const historicalRaw =
+            const chainHistoricalRaw =
               (protocol.chainTvls as Record<string, { tvl?: unknown }>)?.[firstChain]?.tvl ?? [];
+
+            const protocolHistorical = normalizeHistorical(protocol.tvl);
+            const chainHistorical = normalizeHistorical(chainHistoricalRaw);
+            const historicalTvl = protocolHistorical.length ? protocolHistorical : chainHistorical;
 
             return {
               slug: dex.slug,
               name: String(protocol.name ?? dex.name),
-              tvl: toNumber(protocol.tvl),
+              tvl: getLatestTvl(protocol.tvl),
               chainTvls,
-              historicalTvl: normalizeHistorical(historicalRaw),
+              historicalTvl,
             } satisfies ProtocolData;
           }),
         );
@@ -200,6 +208,11 @@ export default function Home() {
         </section>
 
         <section className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {data.length === 0 && (
+            <div className="md:col-span-2 rounded-[24px] bg-white p-6 text-slate-600 shadow-sm">
+              데이터를 가져오지 못했어요. 새로고침하거나 잠시 후 다시 시도해 주세요.
+            </div>
+          )}
           {data.map((protocol) => {
             const oneDay = calcChangePct(protocol.historicalTvl, 1);
             const sevenDay = calcChangePct(protocol.historicalTvl, 7);
