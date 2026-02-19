@@ -1,141 +1,170 @@
 .page {
-  --background: #fafafa;
-  --foreground: #fff;
-
-  --text-primary: #000;
-  --text-secondary: #666;
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
-  display: flex;
   min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
+  background: #f4f6fa;
+  color: #191f28;
+  padding: 40px 16px 64px;
 }
 
-.main {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-  max-width: 800px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
-}
-
-.intro {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
-}
-
-.intro h1 {
-  max-width: 320px;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
-  color: var(--text-primary);
-}
-
-.intro p {
-  max-width: 440px;
-  font-size: 18px;
-  line-height: 32px;
-  text-wrap: balance;
-  color: var(--text-secondary);
-}
-
-.intro a {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.ctas {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 440px;
+.container {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
   gap: 16px;
+}
+
+.hero,
+.notice,
+.error,
+.summaryCard,
+.protocolCard {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.hero {
+  padding: 32px;
+}
+
+.eyebrow {
+  color: #3182f6;
   font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
-.ctas a {
+.hero h1 {
+  font-size: clamp(26px, 4.8vw, 40px);
+  line-height: 1.22;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  color: #4e5968;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.notice,
+.error {
+  padding: 20px 24px;
+  color: #4e5968;
+}
+
+.error {
+  color: #b42318;
+  border: 1px solid #fecaca;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.summaryCard {
+  padding: 20px 22px;
+}
+
+.summaryCard h2 {
+  font-size: 14px;
+  color: #8b95a1;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.summaryCard strong {
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.protocolList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.protocolCard {
+  padding: 22px;
+  display: grid;
+  gap: 16px;
+}
+
+.cardTop {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
-  border: 1px solid transparent;
-  transition: 0.2s;
-  cursor: pointer;
-  width: fit-content;
-  font-weight: 500;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-a.primary {
-  background: var(--text-primary);
-  color: var(--background);
+.cardTop h3 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.cardTop p {
+  color: #4e5968;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.positive,
+.positiveBadge {
+  color: #0f9d58;
+}
+
+.negative,
+.negativeBadge {
+  color: #e11d48;
+}
+
+.positiveBadge,
+.negativeBadge {
+  font-weight: 700;
+  font-size: 14px;
+  padding: 7px 10px;
+  border-radius: 999px;
+}
+
+.positiveBadge {
+  background: #dcfce7;
+}
+
+.negativeBadge {
+  background: #ffe4e6;
+}
+
+.chainList {
+  list-style: none;
+  display: grid;
   gap: 8px;
 }
 
-a.secondary {
-  border-color: var(--button-secondary-border);
+.chainList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #4e5968;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
-
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
-  }
+.chainList li strong {
+  color: #191f28;
 }
 
-@media (max-width: 600px) {
-  .main {
-    padding: 48px 24px;
-  }
-
-  .intro {
-    gap: 16px;
-  }
-
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
-  }
+.chartWrap {
+  width: 100%;
+  height: 168px;
+  border: 1px solid #eef2f6;
+  border-radius: 14px;
+  padding: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
-  }
-
-  .page {
-    --background: #000;
-    --foreground: #000;
-
-    --text-primary: #ededed;
-    --text-secondary: #999;
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+@media (max-width: 920px) {
+  .summaryGrid,
+  .protocolList {
+    grid-template-columns: 1fr;
   }
 }
