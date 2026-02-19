@@ -1,88 +1,50 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import styles from './page.module.css';
 
-interface ProtocolData {
-  name: string;
-  tvl: number;
-  chainTvls: { [key: string]: number };
-  historicalTvl: { date: number; totalLiquidityUSD: number }[];
-}
+const features = [
+  {
+    title: '빠른 시작',
+    description: '원하는 서비스 소개 페이지를 하루 안에 만들 수 있도록 구성했어요.',
+  },
+  {
+    title: '모바일 최적화',
+    description: '스마트폰·태블릿·데스크톱에서 모두 깔끔하게 보이도록 반응형으로 제작했습니다.',
+  },
+  {
+    title: '간단한 커스터마이징',
+    description: '문구와 색상만 바꿔도 나만의 브랜드 사이트로 바로 활용할 수 있습니다.',
+  },
+];
 
 export default function Home() {
-  const [data, setData] = useState<ProtocolData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dexes = ['gmx', 'dydx', 'apex-protocol'];
-      const promises = dexes.map(async (dex) => {
-        try {
-          const response = await axios.get(`https://api.llama.fi/protocol/${dex}`);
-          const protocol = response.data;
-          return {
-            name: protocol.name,
-            tvl: protocol.tvl,
-            chainTvls: protocol.currentChainTvls,
-            historicalTvl: protocol.chainTvls?.[Object.keys(protocol.currentChainTvls)[0]]?.tvl || [],
-          };
-        } catch (error) {
-          console.error(`Error fetching ${dex}:`, error);
-          return null;
-        }
-      });
-
-      const results = (await Promise.all(promises)).filter(Boolean) as ProtocolData[];
-      setData(results);
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) return <div className="flex justify-center items-center h-screen">Loading...</div>;
-
   return (
-    <div className="min-h-screen bg-white text-gray-800 p-8">
-      <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">Perpetual DEX Stats</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {data.map((protocol) => (
-          <div key={protocol.name} className="bg-white shadow-md rounded-lg p-6 border border-blue-200">
-            <h2 className="text-xl font-semibold mb-4 text-blue-500">{protocol.name}</h2>
-            <div className="mb-4">
-              <p><strong>TVL:</strong> ${protocol.tvl.toLocaleString()}</p>
-              <table className="w-full mt-2 border-collapse">
-                <thead>
-                  <tr>
-                    <th className="border px-2 py-1 text-left">Chain</th>
-                    <th className="border px-2 py-1 text-right">TVL</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(protocol.chainTvls).map(([chain, tvl]) => (
-                    <tr key={chain}>
-                      <td className="border px-2 py-1">{chain}</td>
-                      <td className="border px-2 py-1 text-right">${(tvl as number).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={protocol.historicalTvl.map(d => ({ date: new Date(d.date * 1000).toLocaleDateString(), tvl: d.totalLiquidityUSD }))}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="tvl" stroke="#007bff" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+    <div className={styles.page}>
+      <main className={styles.main}>
+        <section className={styles.hero}>
+          <p className={styles.badge}>Starter Website</p>
+          <h1>웹사이트를 만들고 싶다면, 여기서 시작하세요.</h1>
+          <p>
+            이 템플릿은 서비스 소개, 포트폴리오, 개인 프로젝트 랜딩 페이지로 바로 활용할 수 있게
+            구성되어 있습니다.
+          </p>
+          <div className={styles.actions}>
+            <a href="#features" className={styles.primary}>
+              기능 보기
+            </a>
+            <a href="https://nextjs.org/docs" target="_blank" rel="noreferrer" className={styles.secondary}>
+              Next.js 문서
+            </a>
           </div>
-        ))}
-      </div>
+        </section>
+
+        <section id="features" className={styles.features}>
+          {features.map((feature) => (
+            <article key={feature.title} className={styles.card}>
+              <h2>{feature.title}</h2>
+              <p>{feature.description}</p>
+            </article>
+          ))}
+        </section>
+      </main>
     </div>
   );
 }
