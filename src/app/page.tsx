@@ -147,28 +147,29 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb] p-6 md:p-10 text-slate-800">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <header className="rounded-3xl bg-gradient-to-r from-[#1b64f2] to-[#3b82f6] p-7 text-white shadow-lg">
-          <p className="text-sm opacity-90">PerpetualPulse-style Data · Toss-style UI</p>
-          <h1 className="mt-2 text-3xl font-bold">Perpetual DEX Dashboard</h1>
-          <p className="mt-3 text-sm opacity-90">실시간 TVL 중심으로 주요 Perp DEX 상태를 한눈에 확인</p>
+    <main className="min-h-screen bg-[#f2f4f6] p-4 md:p-8 text-slate-800">
+      <div className="mx-auto max-w-6xl space-y-5">
+        <header className="rounded-[32px] bg-gradient-to-br from-[#3182f6] to-[#1b64f2] p-8 text-white shadow-[0_14px_36px_rgba(37,99,235,0.28)]">
+          <p className="text-sm font-medium opacity-95">홈 · 투자</p>
+          <h1 className="mt-2 text-3xl md:text-4xl font-extrabold leading-tight">Perpetual DEX,
+            <br />한 번에 똑똑하게</h1>
+          <p className="mt-3 text-sm opacity-90">PerpetualPulse 참고 데이터 + Toss 스타일 UI</p>
         </header>
 
-        {error && <div className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+        {error && <div className="rounded-[24px] bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+          <div className="rounded-[28px] bg-white px-6 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] border border-slate-100">
             <p className="text-sm text-slate-500">총 TVL</p>
-            <p className="mt-2 text-2xl font-bold">{formatMoney(totalTvl)}</p>
+            <p className="mt-2 text-3xl font-extrabold tracking-tight">{formatMoney(totalTvl)}</p>
           </div>
-          <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+          <div className="rounded-[28px] bg-white px-6 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] border border-slate-100">
             <p className="text-sm text-slate-500">추적 거래소 수</p>
-            <p className="mt-2 text-2xl font-bold">{data.length}</p>
+            <p className="mt-2 text-3xl font-extrabold tracking-tight">{data.length}</p>
           </div>
-          <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+          <div className="rounded-[28px] bg-white px-6 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] border border-slate-100">
             <p className="text-sm text-slate-500">데이터 소스</p>
-            <p className="mt-2 text-lg font-semibold">DefiLlama Protocol API</p>
+            <p className="mt-2 text-base font-bold">DefiLlama Protocol API</p>
           </div>
         </section>
 
@@ -178,19 +179,22 @@ export default function Home() {
             const sevenDay = calcChangePct(protocol.historicalTvl, 7);
 
             return (
-              <article key={protocol.slug} className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+              <article
+                key={protocol.slug}
+                className="rounded-[30px] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.07)] border border-slate-100"
+              >
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900">{protocol.name}</h2>
-                    <p className="text-sm text-slate-500">TVL: {formatMoney(protocol.tvl)}</p>
+                    <h2 className="text-2xl font-extrabold text-slate-900">{protocol.name}</h2>
+                    <p className="mt-1 text-sm text-slate-500">TVL: {formatMoney(protocol.tvl)}</p>
                   </div>
-                  <div className="text-right text-xs text-slate-500">
+                  <div className="rounded-2xl bg-slate-50 px-3 py-2 text-right text-xs text-slate-600">
                     <p>1D {oneDay === null ? '-' : `${oneDay > 0 ? '+' : ''}${oneDay.toFixed(2)}%`}</p>
                     <p>7D {sevenDay === null ? '-' : `${sevenDay > 0 ? '+' : ''}${sevenDay.toFixed(2)}%`}</p>
                   </div>
                 </div>
 
-                <div className="mb-4 h-52 rounded-xl bg-[#f8faff] p-2">
+                <div className="mb-4 h-56 rounded-[22px] bg-[#f7fafe] p-3">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={protocol.historicalTvl.slice(-60).map((d) => ({
@@ -201,7 +205,7 @@ export default function Home() {
                         tvl: d.totalLiquidityUSD,
                       }))}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
                       <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={24} />
                       <YAxis
                         tickFormatter={(v) => formatMoney(typeof v === 'number' ? v : Number(v) || 0)}
@@ -213,8 +217,8 @@ export default function Home() {
                       <Line
                         type="monotone"
                         dataKey="tvl"
-                        stroke="#1b64f2"
-                        strokeWidth={2.5}
+                        stroke="#3182f6"
+                        strokeWidth={3}
                         dot={false}
                         name="TVL"
                       />
@@ -222,12 +226,12 @@ export default function Home() {
                   </ResponsiveContainer>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-slate-100">
+                <div className="overflow-hidden rounded-[20px] border border-slate-100">
                   <table className="w-full text-sm">
                     <thead className="bg-slate-50 text-slate-500">
                       <tr>
-                        <th className="px-3 py-2 text-left">Chain</th>
-                        <th className="px-3 py-2 text-right">TVL</th>
+                        <th className="px-4 py-3 text-left">Chain</th>
+                        <th className="px-4 py-3 text-right">TVL</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -236,8 +240,8 @@ export default function Home() {
                         .slice(0, 6)
                         .map(([chain, tvl]) => (
                           <tr key={chain} className="border-t border-slate-100">
-                            <td className="px-3 py-2">{chain}</td>
-                            <td className="px-3 py-2 text-right font-medium">{formatMoney(tvl)}</td>
+                            <td className="px-4 py-3">{chain}</td>
+                            <td className="px-4 py-3 text-right font-semibold">{formatMoney(tvl)}</td>
                           </tr>
                         ))}
                     </tbody>
