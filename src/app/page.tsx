@@ -18,12 +18,61 @@ type ProtocolCard = {
   chart: Array<{ date: string; tvl: number }>;
 };
 
-const TARGET_PROTOCOLS = [
-  { slug: 'gmx', label: 'GMX' },
-  { slug: 'dydx', label: 'dYdX' },
-  { slug: 'apex-protocol', label: 'ApeX' },
-  { slug: 'synfutures-v3', label: 'SynFutures' },
+type TargetProtocol = {
+  label: string;
+  slugCandidates: string[];
+  nameIncludes?: string[];
+};
+
+type ProtocolCatalogItem = {
+  slug?: string;
+  name?: string;
+};
+
+const TARGET_PROTOCOLS: TargetProtocol[] = [
+  { label: 'GMX', slugCandidates: ['gmx'] },
+  { label: 'dYdX', slugCandidates: ['dydx'] },
+  { label: 'ApeX', slugCandidates: ['apex-protocol'] },
+  { label: 'SynFutures', slugCandidates: ['synfutures-v3'] },
+  {
+    label: 'Backpack',
+    slugCandidates: ['backpack', 'backpack-exchange'],
+    nameIncludes: ['backpack'],
+  },
+  {
+    label: 'Ostium',
+    slugCandidates: ['ostium', 'ostium-protocol'],
+    nameIncludes: ['ostium'],
+  },
+  {
+    label: 'Extended',
+    slugCandidates: ['extended', 'extended-exchange'],
+    nameIncludes: ['extended'],
+  },
+  {
+    label: 'Pacifica',
+    slugCandidates: ['pacifica', 'pacifica-markets'],
+    nameIncludes: ['pacifica'],
+  },
 ];
+
+function resolveProtocolSlug(target: TargetProtocol, catalog: ProtocolCatalogItem[]) {
+  const fromCandidates = target.slugCandidates.find((candidate) =>
+    catalog.some((item) => item.slug?.toLowerCase() === candidate.toLowerCase()),
+  );
+
+  if (fromCandidates) return fromCandidates;
+
+  if (target.nameIncludes?.length) {
+    const byName = catalog.find((item) => {
+      const name = item.name?.toLowerCase() ?? '';
+      return target.nameIncludes?.some((keyword) => name.includes(keyword.toLowerCase()));
+    });
+    if (byName?.slug) return byName.slug;
+  }
+
+  return target.slugCandidates[0];
+}
 
 const formatUsd = (value: number) =>
   new Intl.NumberFormat('ko-KR', {
@@ -64,10 +113,24 @@ export default function Home() {
   useEffect(() => {
     const load = async () => {
       try {
+        let catalog: ProtocolCatalogItem[] = [];
+        try {
+          const catalogRes = await fetch('https://api.llama.fi/protocols');
+          if (catalogRes.ok) {
+            const catalogData = await catalogRes.json();
+            if (Array.isArray(catalogData)) {
+              catalog = catalogData;
+            }
+          }
+        } catch {
+          catalog = [];
+        }
+
         const responses = await Promise.allSettled(
-          TARGET_PROTOCOLS.map(async ({ slug, label }) => {
+          TARGET_PROTOCOLS.map(async (target) => {
+            const slug = resolveProtocolSlug(target, catalog);
             const res = await fetch(`https://api.llama.fi/protocol/${slug}`);
-            if (!res.ok) throw new Error(`${label} 응답 실패`);
+            if (!res.ok) throw new Error(`${target.label} 응답 실패`);
             const data = await res.json();
 
             const history: HistoricalPoint[] = Array.isArray(data.chainTvls?.[Object.keys(data.chainTvls ?? {})[0]]?.tvl)
@@ -76,7 +139,7 @@ export default function Home() {
 
             return {
               slug,
-              name: data.name ?? label,
+              name: data.name ?? target.label,
               tvl: Number(data.tvl ?? 0),
               change7d: getChange7d(history),
               chains: extractChainTvls(data.currentChainTvls),
