@@ -19,6 +19,7 @@ type CoinRow = {
   price: number;
   change24h: number;
   marketCap: number;
+  source: 'coingecko' | 'cmc';
 };
 
 const DEXES = [
@@ -90,7 +91,7 @@ export default function Home() {
       setError(null);
 
       try {
-        const [dexSettled, coinRes] = await Promise.all([
+        const [dexSettled, geckoRes, cmcRes] = await Promise.all([
           Promise.allSettled(
             DEXES.map(async (dex) => {
               const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
@@ -116,6 +117,7 @@ export default function Home() {
               price_change_percentage: '24h',
             },
           }),
+          axios.get('/api/market/cmc').catch(() => null),
         ]);
 
         const d = dexSettled
@@ -124,18 +126,39 @@ export default function Home() {
           .sort((a, b) => b.tvl - a.tvl);
         setDexRows(d);
 
-        const coins = (coinRes.data as Record<string, unknown>[]).map((c) => ({
-          id: String(c.id),
+        const geckoCoins: CoinRow[] = (geckoRes.data as Record<string, unknown>[]).map((c) => ({
+          id: `gecko-${String(c.id)}`,
           symbol: String(c.symbol).toUpperCase(),
           name: String(c.name),
           price: toNumber(c.current_price),
           change24h: toNumber(c.price_change_percentage_24h),
           marketCap: toNumber(c.market_cap),
+          source: 'coingecko',
         }));
-        setCoinRows(coins);
 
-        if (!d.length && !coins.length) {
+        const cmcRaw = cmcRes?.data?.data as Record<string, unknown>[] | undefined;
+        const cmcCoins: CoinRow[] = Array.isArray(cmcRaw)
+          ? cmcRaw.map((c) => {
+              const q = (c.quote as Record<string, unknown>)?.USD as Record<string, unknown>;
+              return {
+                id: `cmc-${String(c.id)}`,
+                symbol: String(c.symbol),
+                name: String(c.name),
+                price: toNumber(q?.price),
+                change24h: toNumber(q?.percent_change_24h),
+                marketCap: toNumber(q?.market_cap),
+                source: 'cmc',
+              };
+            })
+          : [];
+
+        const merged = [...cmcCoins, ...geckoCoins].slice(0, 12);
+        setCoinRows(merged);
+
+        if (!d.length && !merged.length) {
           setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        } else if (!cmcCoins.length) {
+          setError('CoinMarketCap API 키가 없거나 제한되어 CoinGecko 데이터로 우선 표시 중입니다.');
         }
       } catch (e) {
         console.error(e);
@@ -220,7 +243,7 @@ export default function Home() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-bold text-lg">{c.name}</p>
-                    <p className="text-xs text-slate-400">{c.symbol}</p>
+                    <p className="text-xs text-slate-400">{c.symbol} · {c.source.toUpperCase()}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold">{formatMoney(c.price)}</p>
