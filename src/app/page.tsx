@@ -203,8 +203,12 @@ export default function Home() {
                     >
                       <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                       <XAxis dataKey="date" tick={{ fontSize: 11 }} minTickGap={24} />
-                      <YAxis tickFormatter={(v) => formatMoney(v)} tick={{ fontSize: 11 }} width={70} />
-                      <Tooltip formatter={(v: number) => formatMoney(v)} />
+                      <YAxis
+                        tickFormatter={(v) => formatMoney(typeof v === 'number' ? v : Number(v) || 0)}
+                        tick={{ fontSize: 11 }}
+                        width={70}
+                      />
+                      <Tooltip formatter={(v) => formatMoney(typeof v === 'number' ? v : Number(v) || 0)} />
                       <Legend />
                       <Line
                         type="monotone"
