@@ -158,6 +158,32 @@ export default function Home() {
 
         {error && <div className="rounded-[24px] bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
+        <section className="space-y-3">
+          <article className="rounded-[30px] bg-gradient-to-r from-[#f85640] to-[#ff7a1a] px-6 py-5 text-white shadow-[0_14px_30px_rgba(248,86,64,0.35)]">
+            <p className="text-xs font-semibold opacity-90">오늘의 퍼프덱스 브리핑</p>
+            <div className="mt-2 flex items-end justify-between gap-3">
+              <div>
+                <h3 className="text-2xl font-extrabold">Total TVL {formatMoney(totalTvl)}</h3>
+                <p className="mt-1 text-sm opacity-90">상위 Perp DEX의 실시간 유동성 추이</p>
+              </div>
+              <button className="rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-[#f85640] shadow">
+                상세 보기
+              </button>
+            </div>
+          </article>
+
+          <article className="rounded-[30px] bg-gradient-to-r from-[#1d8f45] to-[#75c71f] px-6 py-5 text-white shadow-[0_14px_30px_rgba(34,197,94,0.28)]">
+            <p className="text-xs font-semibold opacity-90">모니터링 현황</p>
+            <div className="mt-2 flex items-end justify-between gap-3">
+              <div>
+                <h3 className="text-2xl font-extrabold">{data.length}개 거래소 추적 중</h3>
+                <p className="mt-1 text-sm opacity-90">GMX · dYdX · Hyperliquid · Apex</p>
+              </div>
+              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">LIVE</span>
+            </div>
+          </article>
+        </section>
+
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="rounded-[28px] bg-white px-6 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.06)] border border-slate-100">
             <p className="text-sm text-slate-500">총 TVL</p>
