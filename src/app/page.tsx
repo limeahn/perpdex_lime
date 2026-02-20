@@ -178,7 +178,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#f3f6fb] text-[#22262f]">
-      <div className="mx-auto w-full max-w-[1100px] px-4 py-6 md:px-6 md:py-10">
+      <div className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-8 md:py-12">
         <p className="text-sm font-semibold text-[#4b7bec]">Perp Pulse · Market Console</p>
         <h1 className="mt-3 text-3xl md:text-5xl font-bold leading-tight tracking-tight">
           빠른 의사결정을 위한
@@ -189,43 +189,43 @@ export default function Home() {
           DefiLlama · CoinMarketCap · CoinGecko를 한 화면에서 함께 확인하세요.
         </p>
 
-        <section className="mt-7 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <article className="rounded-[36px] bg-[#eef4ff] p-5 md:p-6 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#cdddf7]">
+        <section className="mt-9 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <article className="rounded-[36px] bg-[#eef4ff] p-6 md:p-7 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#cdddf7]">
             <p className="text-xs text-slate-500">Total TVL</p>
             <p className="mt-1 text-2xl md:text-3xl font-bold">{formatMoney(totalTvl)}</p>
             <p className="mt-2 text-xs text-slate-400">Perp DEX aggregate · DefiLlama</p>
           </article>
-          <article className="rounded-[36px] bg-[#f2efff] p-5 md:p-6 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd1fb]">
+          <article className="rounded-[36px] bg-[#f2efff] p-6 md:p-7 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd1fb]">
             <p className="text-xs text-slate-500">Avg 24H Move (DEX)</p>
             <p className={`mt-1 text-2xl md:text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
             <p className="mt-2 text-xs text-slate-400">평균 1일 변화율</p>
           </article>
-          <article className="rounded-[36px] bg-[#eefbf3] p-5 md:p-6 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#c9eecf]">
+          <article className="rounded-[36px] bg-[#eefbf3] p-6 md:p-7 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#c9eecf]">
             <p className="text-xs text-slate-500">Top DEX by TVL</p>
             <p className="mt-1 text-2xl md:text-3xl font-bold">{topDex?.name ?? '-'}</p>
             <p className="mt-2 text-xs text-slate-400">{topDex ? formatMoney(topDex.tvl) : '-'}</p>
           </article>
         </section>
 
-        {error && <div className="mt-4 rounded-[28px] bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
+        {error && <div className="mt-6 rounded-[28px] bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
 
-        <section className="mt-8 grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <section className="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-7">
           <div className="lg:col-span-2 rounded-[36px] bg-[#f7f4ff] p-5 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd3fa]">
-            <div className="mb-3 flex items-end justify-between">
+            <div className="mb-5 flex items-end justify-between">
               <h2 className="text-xl font-bold">Perp DEX 랭킹</h2>
               <span className="text-xs text-slate-400">TVL / 1D / 7D</span>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {loading && [1, 2, 3].map((n) => <div key={n} className="h-16 rounded-[28px] bg-slate-100 animate-pulse" />)}
               {!loading && dexRows.map((r, i) => (
-                <article key={r.slug} className="rounded-[28px] bg-white px-3 py-3 border border-[#e7edf5] shadow-[0_2px_8px_rgba(15,23,42,0.06)]">
+                <article key={r.slug} className="rounded-[28px] bg-white px-4 py-4 border border-[#e7edf5] shadow-[0_2px_8px_rgba(15,23,42,0.06)]">
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <p className="text-xs text-slate-400">#{i + 1}</p>
                       <p className="font-semibold">{r.name}</p>
                       <p className="text-xs text-slate-500">{formatMoney(r.tvl)}</p>
                     </div>
-                    <div className="text-right text-xs leading-5">
+                    <div className="text-right text-xs leading-6">
                       <div className={tone(r.d1)}>1D {formatPct(r.d1)}</div>
                       <div className={tone(r.d7)}>7D {formatPct(r.d7)}</div>
                     </div>
@@ -236,13 +236,13 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-3 rounded-[36px] bg-[#f7fbff] p-5 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#d1e3f8]">
-            <div className="mb-3 flex items-end justify-between">
+            <div className="mb-5 flex items-end justify-between">
               <h2 className="text-xl font-bold">코인 마켓 스냅샷</h2>
               <span className="text-xs text-slate-400">CMC + CoinGecko</span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm leading-6">
                 <thead className="text-slate-400 border-b border-slate-100">
                   <tr>
                     <th className="py-2 text-left font-medium">코인</th>
@@ -255,16 +255,16 @@ export default function Home() {
                 <tbody>
                   {coinRows.map((c) => (
                     <tr key={c.id} className="border-b border-[#e8edf4]">
-                      <td className="py-2.5">
+                      <td className="py-4">
                         <p className="font-semibold leading-4">{c.name}</p>
                         <p className="text-xs text-slate-400">{c.symbol}</p>
                       </td>
-                      <td className="py-2.5 text-right font-semibold">{formatMoney(c.price)}</td>
-                      <td className={`py-2.5 text-right font-semibold ${tone(c.change24h)}`}>
+                      <td className="py-4 text-right font-semibold">{formatMoney(c.price)}</td>
+                      <td className={`py-4 text-right font-semibold ${tone(c.change24h)}`}>
                         {formatPct(c.change24h)}
                       </td>
-                      <td className="py-2.5 text-right">{formatMoney(c.marketCap)}</td>
-                      <td className="py-2.5 text-right text-xs text-slate-400 uppercase">{c.source}</td>
+                      <td className="py-4 text-right">{formatMoney(c.marketCap)}</td>
+                      <td className="py-4 text-right text-xs text-slate-400 uppercase">{c.source}</td>
                     </tr>
                   ))}
                 </tbody>
