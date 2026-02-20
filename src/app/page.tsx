@@ -155,11 +155,9 @@ export default function Home() {
         setCoinRows(merged);
 
         if (!d.length && !merged.length) setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-        else if (!cmcCoins.length)
-          setError('CoinMarketCap 키가 없거나 제한되어 CoinGecko 데이터 중심으로 표시 중입니다.');
       } catch (e) {
         console.error(e);
-        setError('일부 데이터 소스 연결에 실패했습니다. 새로고침해 주세요.');
+        setError('일부 데이터 소스 연결에 실패했습니다.');
       } finally {
         setLoading(false);
       }
@@ -174,56 +172,56 @@ export default function Home() {
     if (!vals.length) return null;
     return vals.reduce((a, b) => a + b, 0) / vals.length;
   }, [dexRows]);
-  const topDex = dexRows[0];
 
   return (
-    <main className="min-h-screen bg-[#f3f6fb] text-[#22262f]">
-      <div className="mx-auto w-full max-w-[1120px] px-5 py-8 md:px-8 md:py-12">
-        <p className="text-sm font-semibold text-[#4b7bec]">Perp Pulse · Market Console</p>
-        <h1 className="mt-3 text-3xl md:text-5xl font-bold leading-tight tracking-tight">
-          빠른 의사결정을 위한
-          <br className="hidden md:block" /> 시장 데이터 대시보드
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm md:text-base text-slate-500">
-          Toss의 깔끔한 정보 구조와 coinary.ai의 데이터 밀도를 참고해 구성했습니다.
-          DefiLlama · CoinMarketCap · CoinGecko를 한 화면에서 함께 확인하세요.
-        </p>
+    <main className="min-h-screen bg-gradient-to-b from-[#f7f9ff] to-[#f4f7fb] text-[#1b2430]">
+      <div className="mx-auto w-full max-w-[1140px] px-5 py-10 md:px-10 md:py-14">
+        <header className="rounded-[40px] bg-white/85 backdrop-blur border border-[#e8eef8] shadow-[0_12px_30px_rgba(71,85,105,0.08)] p-8 md:p-10">
+          <p className="text-sm font-semibold text-[#5b7cfa]">Perp Pulse</p>
+          <h1 className="mt-3 text-3xl md:text-5xl font-bold leading-tight tracking-tight">
+            더 보기 좋고,
+            <br className="hidden md:block" /> 더 빠르게 읽히는 시장 대시보드
+          </h1>
+          <p className="mt-4 text-sm md:text-base text-slate-500 max-w-3xl">
+            Toss 감성의 말랑한 UI에 핵심 지표만 담았습니다. TVL, DEX 변화율, 코인 시황을 한 화면에서 확인해요.
+          </p>
+        </header>
 
-        <section className="mt-9 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <article className="rounded-[36px] bg-[#eef4ff] p-6 md:p-7 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#cdddf7]">
+        {error && <div className="mt-6 rounded-[24px] bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
+
+        <section className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-7">
+          <article className="rounded-[34px] bg-[#ecf4ff] border-2 border-[#d7e6fb] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <p className="text-xs text-slate-500">Total TVL</p>
-            <p className="mt-1 text-2xl md:text-3xl font-bold">{formatMoney(totalTvl)}</p>
-            <p className="mt-2 text-xs text-slate-400">Perp DEX aggregate · DefiLlama</p>
+            <p className="mt-2 text-3xl font-bold">{formatMoney(totalTvl)}</p>
+            <p className="mt-2 text-xs text-slate-500">DefiLlama Aggregate</p>
           </article>
-          <article className="rounded-[36px] bg-[#f2efff] p-6 md:p-7 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd1fb]">
-            <p className="text-xs text-slate-500">Avg 24H Move (DEX)</p>
-            <p className={`mt-1 text-2xl md:text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
-            <p className="mt-2 text-xs text-slate-400">평균 1일 변화율</p>
+          <article className="rounded-[34px] bg-[#f4f0ff] border-2 border-[#e3d8fb] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+            <p className="text-xs text-slate-500">Avg DEX 24H</p>
+            <p className={`mt-2 text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
+            <p className="mt-2 text-xs text-slate-500">평균 1일 변화율</p>
           </article>
-          <article className="rounded-[36px] bg-[#eefbf3] p-6 md:p-7 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#c9eecf]">
-            <p className="text-xs text-slate-500">Top DEX by TVL</p>
-            <p className="mt-1 text-2xl md:text-3xl font-bold">{topDex?.name ?? '-'}</p>
-            <p className="mt-2 text-xs text-slate-400">{topDex ? formatMoney(topDex.tvl) : '-'}</p>
+          <article className="rounded-[34px] bg-[#effaf3] border-2 border-[#d5f0de] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+            <p className="text-xs text-slate-500">Tracked DEX</p>
+            <p className="mt-2 text-3xl font-bold">{dexRows.length}</p>
+            <p className="mt-2 text-xs text-slate-500">GMX · dYdX · Hyperliquid · ApeX</p>
           </article>
         </section>
 
-        {error && <div className="mt-6 rounded-[28px] bg-rose-50 p-3 text-sm text-rose-700">{error}</div>}
-
-        <section className="mt-10 grid grid-cols-1 lg:grid-cols-5 gap-7">
-          <div className="lg:col-span-2 rounded-[36px] bg-[#f7f4ff] p-5 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#ddd3fa]">
+        <section className="mt-11 grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-2 rounded-[34px] bg-[#faf7ff] border-2 border-[#e6dcfb] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <div className="mb-5 flex items-end justify-between">
               <h2 className="text-xl font-bold">Perp DEX 랭킹</h2>
-              <span className="text-xs text-slate-400">TVL / 1D / 7D</span>
+              <span className="text-xs text-slate-500">TVL / 1D / 7D</span>
             </div>
             <div className="space-y-4">
-              {loading && [1, 2, 3].map((n) => <div key={n} className="h-16 rounded-[28px] bg-slate-100 animate-pulse" />)}
+              {loading && [1, 2, 3].map((n) => <div key={n} className="h-20 rounded-[26px] bg-white/70 animate-pulse" />)}
               {!loading && dexRows.map((r, i) => (
-                <article key={r.slug} className="rounded-[28px] bg-white px-4 py-4 border border-[#e7edf5] shadow-[0_2px_8px_rgba(15,23,42,0.06)]">
-                  <div className="flex items-center justify-between gap-2">
+                <article key={r.slug} className="rounded-[26px] bg-white px-5 py-5 border border-[#e8edf5] shadow-[0_3px_10px_rgba(30,41,59,0.05)]">
+                  <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-slate-400">#{i + 1}</p>
-                      <p className="font-semibold">{r.name}</p>
-                      <p className="text-xs text-slate-500">{formatMoney(r.tvl)}</p>
+                      <p className="font-semibold text-[17px]">{r.name}</p>
+                      <p className="text-xs text-slate-500 mt-1">{formatMoney(r.tvl)}</p>
                     </div>
                     <div className="text-right text-xs leading-6">
                       <div className={tone(r.d1)}>1D {formatPct(r.d1)}</div>
@@ -235,34 +233,31 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-3 rounded-[36px] bg-[#f7fbff] p-5 shadow-[0_10px_24px_rgba(30,41,59,0.10)] border-2 border-[#d1e3f8]">
+          <div className="lg:col-span-3 rounded-[34px] bg-[#f8fcff] border-2 border-[#dbe9f8] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <div className="mb-5 flex items-end justify-between">
               <h2 className="text-xl font-bold">코인 마켓 스냅샷</h2>
-              <span className="text-xs text-slate-400">CMC + CoinGecko</span>
+              <span className="text-xs text-slate-500">CMC + CoinGecko</span>
             </div>
-
             <div className="overflow-x-auto">
-              <table className="w-full text-sm leading-6">
-                <thead className="text-slate-400 border-b border-slate-100">
+              <table className="w-full text-sm leading-7">
+                <thead className="text-slate-400 border-b border-[#e2e8f0]">
                   <tr>
-                    <th className="py-2 text-left font-medium">코인</th>
-                    <th className="py-2 text-right font-medium">가격</th>
-                    <th className="py-2 text-right font-medium">24H</th>
-                    <th className="py-2 text-right font-medium">시가총액</th>
-                    <th className="py-2 text-right font-medium">출처</th>
+                    <th className="py-3 text-left font-medium">코인</th>
+                    <th className="py-3 text-right font-medium">가격</th>
+                    <th className="py-3 text-right font-medium">24H</th>
+                    <th className="py-3 text-right font-medium">시가총액</th>
+                    <th className="py-3 text-right font-medium">출처</th>
                   </tr>
                 </thead>
                 <tbody>
                   {coinRows.map((c) => (
                     <tr key={c.id} className="border-b border-[#e8edf4]">
                       <td className="py-4">
-                        <p className="font-semibold leading-4">{c.name}</p>
+                        <p className="font-semibold leading-5">{c.name}</p>
                         <p className="text-xs text-slate-400">{c.symbol}</p>
                       </td>
                       <td className="py-4 text-right font-semibold">{formatMoney(c.price)}</td>
-                      <td className={`py-4 text-right font-semibold ${tone(c.change24h)}`}>
-                        {formatPct(c.change24h)}
-                      </td>
+                      <td className={`py-4 text-right font-semibold ${tone(c.change24h)}`}>{formatPct(c.change24h)}</td>
                       <td className="py-4 text-right">{formatMoney(c.marketCap)}</td>
                       <td className="py-4 text-right text-xs text-slate-400 uppercase">{c.source}</td>
                     </tr>
