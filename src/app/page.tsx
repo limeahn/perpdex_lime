@@ -197,7 +197,7 @@ export default function Home() {
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서. 거래소 클릭 시 바로 레퍼럴 링크로 이동합니다.</p>
         </header>
 
-        <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-indigo-300/30 bg-gradient-to-br from-indigo-400/30 via-blue-500/20 to-indigo-900/25 p-6 backdrop-blur">
             <p className="text-xs text-slate-300">Total TVL</p>
             <p className="mt-2 text-3xl font-semibold">{money(total)}</p>
@@ -205,10 +205,6 @@ export default function Home() {
           <div className="rounded-2xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/30 via-sky-500/20 to-cyan-900/25 p-6 backdrop-blur">
             <p className="text-xs text-slate-300">Tracked Exchanges</p>
             <p className="mt-2 text-3xl font-semibold">{dexRows.length}</p>
-          </div>
-          <div className="rounded-2xl border border-fuchsia-300/30 bg-gradient-to-br from-fuchsia-400/30 via-pink-500/20 to-fuchsia-900/25 p-6 backdrop-blur">
-            <p className="text-xs text-slate-300">Top Exchange</p>
-            <p className="mt-2 text-3xl font-semibold">{dexRows[0]?.name ?? '-'}</p>
           </div>
         </section>
 
