@@ -291,29 +291,38 @@ export default function Home() {
                   return (
                   <button
                     key={`${r.name}-${r.link}`}
-                    className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-slate-900/70 to-indigo-900/40 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-300/40"
+                    className="group rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-[#101a2f] via-[#11162a] to-[#1a1a38] p-5 text-left transition hover:-translate-y-1 hover:border-cyan-300/50 hover:shadow-[0_16px_40px_rgba(34,211,238,0.18)]"
                     onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
                   >
-                    <div className="mb-3 flex items-center justify-between">
-                      <p className="text-lg font-extrabold tracking-tight">{r.name}</p>
-                      <span className="text-cyan-300 text-sm">Open ↗</span>
+                    <div className="mb-4 flex items-center justify-between">
+                      <p className="text-xl font-extrabold tracking-tight">{r.name}</p>
+                      <span className="rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200">Open ↗</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                      <p className="text-slate-400">TVL</p>
-                      <p className="text-right">
-                        <HoverMetric value={r.tvl > 0 ? money(r.tvl) : '-'} series={r.tvlSeries} />
-                      </p>
-                      <p className="text-slate-400">24H Vol</p>
-                      <p className="text-right">
-                        <HoverMetric value={r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'} series={volSeries} />
-                      </p>
-                      <p className="text-slate-400">1D / 7D</p>
-                      <p className={`text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        <HoverMetric
-                          value={`${p(r.d1)} / ${p(r.d7)}`}
-                          series={changeSeries}
+
+                    <div className="mb-4 grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl bg-white/5 p-3">
+                        <p className="text-[11px] text-slate-400">TVL</p>
+                        <p className="mt-1 text-base font-semibold"><HoverMetric value={r.tvl > 0 ? money(r.tvl) : '-'} series={r.tvlSeries} /></p>
+                      </div>
+                      <div className="rounded-2xl bg-white/5 p-3">
+                        <p className="text-[11px] text-slate-400">24H Vol</p>
+                        <p className="mt-1 text-base font-semibold"><HoverMetric value={r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'} series={volSeries} /></p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl bg-white/5 p-3">
+                      <div className="mb-2 flex items-center justify-between text-sm">
+                        <span className="text-slate-400">Momentum</span>
+                        <span className={r.d1 != null && r.d1 >= 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
+                          <HoverMetric value={`${p(r.d1)} / ${p(r.d7)}`} series={changeSeries} />
+                        </span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-white/10">
+                        <div
+                          className={`h-2 rounded-full ${r.d1 != null && r.d1 >= 0 ? 'bg-emerald-400' : 'bg-rose-400'}`}
+                          style={{ width: `${Math.min(100, Math.max(12, Math.abs((r.d1 ?? 0) * 3)))}%` }}
                         />
-                      </p>
+                      </div>
                     </div>
                   </button>
                   );
@@ -327,15 +336,15 @@ export default function Home() {
             <h2 className="mb-5 text-xl font-semibold">Coin Pulse</h2>
             <div className="space-y-3">
               {coinRows.map((c) => (
-                <div key={c.id} className="rounded-xl border border-white/10 bg-gradient-to-r from-sky-500/10 to-violet-500/10 p-4">
+                <div key={c.id} className="rounded-2xl border border-white/10 bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-violet-500/10 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-bold">{c.name}</p>
+                      <p className="font-bold text-base">{c.name}</p>
                       <p className="text-xs text-slate-400">{c.symbol} · {c.source.toUpperCase()}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{money(c.price)}</p>
-                      <p className={c.change24h >= 0 ? 'text-emerald-400 text-sm' : 'text-rose-400 text-sm'}>{p(c.change24h)}</p>
+                      <p className="font-semibold">{money(c.price)}</p>
+                      <p className={c.change24h >= 0 ? 'text-emerald-400 text-sm font-semibold' : 'text-rose-400 text-sm font-semibold'}>{p(c.change24h)}</p>
                     </div>
                   </div>
                 </div>
