@@ -80,7 +80,7 @@ export default function Home() {
   useEffect(() => {
     const run = async () => {
       setLoading(true);
-      const [overviewRes, dexSettled, geckoRes, cmcRes] = await Promise.all([
+      const [overviewRes, dexSettled, geckoRes, cmcRes, backpackTickersRes] = await Promise.all([
         axios.get('https://api.llama.fi/overview/derivatives?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true').catch(() => null),
         Promise.allSettled(
           DEXES.map(async (dex) => {
@@ -121,6 +121,7 @@ export default function Home() {
           },
         }),
         axios.get('/api/market/cmc').catch(() => null),
+        axios.get('https://api.backpack.exchange/api/v1/tickers').catch(() => null),
       ]);
 
       const overviewProtocols: any[] = overviewRes?.data?.protocols ?? [];
@@ -133,9 +134,22 @@ export default function Home() {
         return matched.sort((a, b) => n(b?.total24h) - n(a?.total24h))[0];
       };
 
+      const backpackTickers: any[] = Array.isArray(backpackTickersRes?.data) ? backpackTickersRes.data : [];
+      const backpackPerpVolume24h = backpackTickers
+        .filter((t) => String(t?.symbol ?? '').includes('_PERP'))
+        .reduce((sum, t) => sum + n(t?.quoteVolume), 0);
+
       const dex = dexSettled
         .filter((r): r is PromiseFulfilledResult<ProtocolRow> => r.status === 'fulfilled')
         .map((r) => {
+          if (r.value.name.toLowerCase() === 'backpack') {
+            return {
+              ...r.value,
+              volume24h: backpackPerpVolume24h > 0 ? backpackPerpVolume24h : null,
+              users24h: null,
+            };
+          }
+
           const ov = pickOverview(r.value.name, r.value.slug);
           return {
             ...r.value,
