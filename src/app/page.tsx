@@ -4,7 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 type HistoricalPoint = { date: number; totalLiquidityUSD: number };
-type ProtocolRow = { slug: string; name: string; tvl: number; d1: number | null; d7: number | null };
+type ProtocolRow = {
+  slug?: string;
+  name: string;
+  tvl: number;
+  d1: number | null;
+  d7: number | null;
+  link: string;
+};
+
 type CoinRow = {
   id: string;
   symbol: string;
@@ -15,11 +23,15 @@ type CoinRow = {
   source: 'coingecko' | 'cmc';
 };
 
-const DEXES = [
-  { slug: 'gmx', name: 'GMX' },
-  { slug: 'dydx', name: 'dYdX' },
-  { slug: 'hyperliquid', name: 'Hyperliquid' },
-  { slug: 'apex-protocol', name: 'ApeX' },
+const DEXES: Array<{ slug?: string; name: string; link: string }> = [
+  { slug: 'gmx', name: 'GMX', link: 'https://app.gmx.io/' },
+  { slug: 'dydx', name: 'dYdX', link: 'https://trade.dydx.exchange/' },
+  { slug: 'hyperliquid', name: 'Hyperliquid', link: 'https://app.hyperliquid.xyz/' },
+  { slug: 'apex-protocol', name: 'ApeX', link: 'https://pro.apex.exchange/' },
+  { name: 'Extended', link: 'https://app.extended.exchange/join/LIME' },
+  { name: 'STANDX', link: 'https://standx.com/referral?code=lime' },
+  { name: 'Pacifica', link: 'https://app.pacifica.fi?referral=lime' },
+  { name: 'Ostium', link: 'https://app.ostium.com/trade?from=SPX&to=USD&ref=RJ1QP' },
 ];
 
 const n = (v: unknown) => (typeof v === 'number' ? v : Number(v) || 0);
@@ -63,10 +75,20 @@ export default function Home() {
       const [dexSettled, geckoRes, cmcRes] = await Promise.all([
         Promise.allSettled(
           DEXES.map(async (dex) => {
+            if (!dex.slug) {
+              return { name: dex.name, tvl: 0, d1: null, d7: null, link: dex.link } as ProtocolRow;
+            }
             const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
             const hist = normalizeHistorical((res.data as any).tvl);
             const tvl = hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
-            return { slug: dex.slug, name: (res.data as any).name ?? dex.name, tvl, d1: pct(hist, 1), d7: pct(hist, 7) };
+            return {
+              slug: dex.slug,
+              name: (res.data as any).name ?? dex.name,
+              tvl,
+              d1: pct(hist, 1),
+              d7: pct(hist, 7),
+              link: dex.link,
+            } as ProtocolRow;
           }),
         ),
         axios.get('https://api.coingecko.com/api/v3/coins/markets', {
@@ -152,18 +174,29 @@ export default function Home() {
                     <th className="py-3 text-right">TVL</th>
                     <th className="py-3 text-right">1D</th>
                     <th className="py-3 text-right">7D</th>
+                    <th className="py-3 text-right">Link</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {loading && <tr><td className="py-6 text-slate-500" colSpan={4}>Loading...</td></tr>}
-                  {!loading && dexRows.map((r) => (
-                    <tr key={r.slug} className="border-b border-[#141c2a]">
-                      <td className="py-4 font-medium">{r.name}</td>
-                      <td className="py-4 text-right">{money(r.tvl)}</td>
-                      <td className={`py-4 text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d1)}</td>
-                      <td className={`py-4 text-right ${r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d7)}</td>
+                  {loading && (
+                    <tr>
+                      <td className="py-6 text-slate-500" colSpan={5}>Loading...</td>
                     </tr>
-                  ))}
+                  )}
+                  {!loading &&
+                    dexRows.map((r) => (
+                      <tr
+                        key={`${r.name}-${r.link}`}
+                        className="border-b border-[#141c2a] cursor-pointer hover:bg-[#111a2a]"
+                        onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
+                      >
+                        <td className="py-4 font-medium">{r.name}</td>
+                        <td className="py-4 text-right">{r.tvl > 0 ? money(r.tvl) : '-'}</td>
+                        <td className={`py-4 text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d1)}</td>
+                        <td className={`py-4 text-right ${r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d7)}</td>
+                        <td className="py-4 text-right text-[#67a2ff]">Open ↗</td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -177,7 +210,9 @@ export default function Home() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{c.name}</p>
-                      <p className="text-xs text-slate-400">{c.symbol} · {c.source.toUpperCase()}</p>
+                      <p className="text-xs text-slate-400">
+                        {c.symbol} · {c.source.toUpperCase()}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">{money(c.price)}</p>
