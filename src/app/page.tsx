@@ -8,6 +8,8 @@ type ProtocolRow = {
   slug?: string;
   name: string;
   tvl: number;
+  volume24h: number | null;
+  users24h: number | null;
   d1: number | null;
   d7: number | null;
   link: string;
@@ -65,6 +67,11 @@ function p(v: number | null) {
   return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 }
 
+function users(v: number | null) {
+  if (v == null || v <= 0) return '-';
+  return Math.round(v).toLocaleString();
+}
+
 export default function Home() {
   const [dexRows, setDexRows] = useState<ProtocolRow[]>([]);
   const [coinRows, setCoinRows] = useState<CoinRow[]>([]);
@@ -73,11 +80,20 @@ export default function Home() {
   useEffect(() => {
     const run = async () => {
       setLoading(true);
-      const [dexSettled, geckoRes, cmcRes] = await Promise.all([
+      const [overviewRes, dexSettled, geckoRes, cmcRes] = await Promise.all([
+        axios.get('https://api.llama.fi/overview/derivatives?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true').catch(() => null),
         Promise.allSettled(
           DEXES.map(async (dex) => {
             if (!dex.slug) {
-              return { name: dex.name, tvl: 0, d1: null, d7: null, link: dex.link } as ProtocolRow;
+              return {
+                name: dex.name,
+                tvl: 0,
+                volume24h: null,
+                users24h: null,
+                d1: null,
+                d7: null,
+                link: dex.link,
+              } as ProtocolRow;
             }
             const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
             const hist = normalizeHistorical((res.data as any).tvl);
@@ -86,6 +102,8 @@ export default function Home() {
               slug: dex.slug,
               name: (res.data as any).name ?? dex.name,
               tvl,
+              volume24h: null,
+              users24h: null,
               d1: pct(hist, 1),
               d7: pct(hist, 7),
               link: dex.link,
@@ -105,9 +123,27 @@ export default function Home() {
         axios.get('/api/market/cmc').catch(() => null),
       ]);
 
+      const overviewProtocols: any[] = overviewRes?.data?.protocols ?? [];
+      const pickOverview = (name: string, slug?: string) => {
+        const q = `${name} ${slug ?? ''}`.toLowerCase();
+        const matched = overviewProtocols.filter((p) => {
+          const hay = `${p?.displayName ?? ''} ${p?.name ?? ''} ${p?.slug ?? ''} ${p?.module ?? ''} ${(p?.linkedProtocols ?? []).join(' ')}`.toLowerCase();
+          return hay.includes(name.toLowerCase()) || (slug ? hay.includes(slug.toLowerCase()) : false) || (slug === 'dydx' && hay.includes('dydx'));
+        });
+        if (!matched.length) return null;
+        return matched.sort((a, b) => n(b?.total24h) - n(a?.total24h))[0];
+      };
+
       const dex = dexSettled
         .filter((r): r is PromiseFulfilledResult<ProtocolRow> => r.status === 'fulfilled')
-        .map((r) => r.value)
+        .map((r) => {
+          const ov = pickOverview(r.value.name, r.value.slug);
+          return {
+            ...r.value,
+            volume24h: ov ? n(ov.total24h) : null,
+            users24h: ov ? n(ov.users24h ?? ov.uniqueUsers24h ?? ov.activeUsers24h) || null : null,
+          };
+        })
         .sort((a, b) => b.tvl - a.tvl);
       setDexRows(dex);
 
@@ -173,6 +209,8 @@ export default function Home() {
                   <tr>
                     <th className="py-3 text-left">Exchange</th>
                     <th className="py-3 text-right">TVL</th>
+                    <th className="py-3 text-right">24H Vol</th>
+                    <th className="py-3 text-right">Users</th>
                     <th className="py-3 text-right">1D</th>
                     <th className="py-3 text-right">7D</th>
                     <th className="py-3 text-right">Link</th>
@@ -181,7 +219,7 @@ export default function Home() {
                 <tbody>
                   {loading && (
                     <tr>
-                      <td className="py-6 text-slate-500" colSpan={5}>Loading...</td>
+                      <td className="py-6 text-slate-500" colSpan={7}>Loading...</td>
                     </tr>
                   )}
                   {!loading &&
@@ -193,6 +231,8 @@ export default function Home() {
                       >
                         <td className="py-4 font-medium">{r.name}</td>
                         <td className="py-4 text-right">{r.tvl > 0 ? money(r.tvl) : '-'}</td>
+                        <td className="py-4 text-right">{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</td>
+                        <td className="py-4 text-right">{users(r.users24h)}</td>
                         <td className={`py-4 text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d1)}</td>
                         <td className={`py-4 text-right ${r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d7)}</td>
                         <td className="py-4 text-right text-[#67a2ff]">Open ↗</td>
