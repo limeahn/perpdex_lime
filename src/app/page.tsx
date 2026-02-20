@@ -192,7 +192,6 @@ export default function Home() {
 
       <div className="relative mx-auto max-w-[1320px] px-6 py-10 md:px-10">
         <header className="mb-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-xl">
-          <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">LIME MARKET BOARD</p>
           <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Modern Perp Exchange Intelligence</h1>
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서 확인하세요.</p>
         </header>
