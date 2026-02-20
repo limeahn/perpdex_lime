@@ -107,7 +107,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const [nowTs, setNowTs] = useState<number>(Date.now());
-  const [nextRefreshAt, setNextRefreshAt] = useState<number>(Date.now() + 10000);
+  const [nextRefreshAt, setNextRefreshAt] = useState<number>(Date.now() + 1000);
   const [activeTab, setActiveTab] = useState<'all' | 'exchanges' | 'coins'>('all');
 
   const fetchData = async (silent = false) => {
@@ -222,14 +222,14 @@ export default function Home() {
     } catch (e) {
       console.error('auto-refresh fetch failed', e);
     } finally {
-      setNextRefreshAt(Date.now() + 10000);
+      setNextRefreshAt(Date.now() + 1000);
       if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData(false);
-    const poll = setInterval(() => fetchData(true), 10000);
+    const poll = setInterval(() => fetchData(true), 1000);
     const ticker = setInterval(() => setNowTs(Date.now()), 1000);
     return () => {
       clearInterval(poll);
@@ -250,7 +250,7 @@ export default function Home() {
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨 흐름을 시각적으로 빠르게 확인하세요.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
-            <span className="text-slate-300">· 10초 자동 갱신</span>
+            <span className="text-slate-300">· 1초 자동 갱신</span>
             <span className="text-slate-300">· 마지막 업데이트 {secondsSinceUpdate == null ? '-' : `${secondsSinceUpdate}s 전`}</span>
             <span className="text-slate-300">· 다음 갱신 {Math.max(0, Math.ceil((nextRefreshAt - nowTs) / 1000))}s</span>
           </div>
