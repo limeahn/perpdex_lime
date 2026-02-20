@@ -26,10 +26,7 @@ type CoinRow = {
 };
 
 const DEXES: Array<{ slug?: string; name: string; link: string }> = [
-  { slug: 'gmx', name: 'GMX', link: 'https://app.gmx.io/' },
-  { slug: 'dydx', name: 'dYdX', link: 'https://trade.dydx.exchange/' },
   { slug: 'hyperliquid', name: 'Hyperliquid', link: 'https://app.hyperliquid.xyz/' },
-  { slug: 'apex-protocol', name: 'ApeX', link: 'https://pro.apex.exchange/' },
   { name: 'Extended', link: 'https://app.extended.exchange/join/LIME' },
   { name: 'STANDX', link: 'https://standx.com/referral?code=lime' },
   { name: 'Pacifica', link: 'https://app.pacifica.fi?referral=lime' },
