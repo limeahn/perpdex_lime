@@ -75,12 +75,15 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const [nowTs, setNowTs] = useState<number>(Date.now());
+  const [nextRefreshAt, setNextRefreshAt] = useState<number>(Date.now() + 10000);
 
   const fetchData = async (silent = false) => {
-    if (!silent) setLoading(true);
+    try {
+      if (!silent) setLoading(true);
+      const ts = Date.now();
 
-    const [overviewRes, dexSettled, geckoRes, cmcRes, backpackTickersRes] = await Promise.all([
-      axios.get('https://api.llama.fi/overview/derivatives?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true').catch(() => null),
+      const [overviewRes, dexSettled, geckoRes, cmcRes, backpackTickersRes] = await Promise.all([
+      axios.get('https://api.llama.fi/overview/derivatives?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true', { params: { _ts: ts } }).catch(() => null),
       Promise.allSettled(
         DEXES.map(async (dex) => {
           if (!dex.slug) {
@@ -94,7 +97,7 @@ export default function Home() {
               link: dex.link,
             } as ProtocolRow;
           }
-          const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
+          const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`, { params: { _ts: ts } });
           const hist = normalizeHistorical((res.data as any).tvl);
           const tvl = hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
           return {
@@ -182,13 +185,18 @@ export default function Home() {
       : [];
     setCoinRows([...cmc, ...gecko].slice(0, 8));
 
-    setLastUpdatedAt(Date.now());
-    if (!silent) setLoading(false);
+      setLastUpdatedAt(Date.now());
+    } catch (e) {
+      console.error('auto-refresh fetch failed', e);
+    } finally {
+      setNextRefreshAt(Date.now() + 10000);
+      if (!silent) setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchData(false);
-    const poll = setInterval(() => fetchData(true), 30000);
+    const poll = setInterval(() => fetchData(true), 10000);
     const ticker = setInterval(() => setNowTs(Date.now()), 1000);
     return () => {
       clearInterval(poll);
@@ -209,8 +217,9 @@ export default function Home() {
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서 확인하세요.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
-            <span className="text-slate-300">· 30초 자동 갱신</span>
+            <span className="text-slate-300">· 10초 자동 갱신</span>
             <span className="text-slate-300">· 마지막 업데이트 {secondsSinceUpdate == null ? '-' : `${secondsSinceUpdate}s 전`}</span>
+            <span className="text-slate-300">· 다음 갱신 {Math.max(0, Math.ceil((nextRefreshAt - nowTs) / 1000))}s</span>
           </div>
         </header>
 
