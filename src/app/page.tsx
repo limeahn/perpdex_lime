@@ -70,44 +70,13 @@ function users(v: number | null) {
   return Math.round(v).toLocaleString();
 }
 
-function Sparkline({ series }: { series: number[] }) {
-  if (!series || series.length < 2) return <div className="text-[10px] text-slate-400">차트 데이터 없음</div>;
-  const min = Math.min(...series);
-  const max = Math.max(...series);
-  const w = 160;
-  const h = 56;
-  const points = series
-    .map((v, i) => {
-      const x = (i / (series.length - 1)) * w;
-      const y = h - ((v - min) / (max - min || 1)) * h;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
-      <polyline fill="none" stroke="#22d3ee" strokeWidth="2" points={points} />
-    </svg>
-  );
-}
-
-function HoverMetric({ value, series }: { value: string; series: number[] }) {
-  return (
-    <div className="group relative inline-flex justify-end">
-      <span>{value}</span>
-      <div className="pointer-events-none absolute right-0 top-full z-20 mt-2 hidden w-[190px] rounded-xl border border-cyan-300/30 bg-[#081120]/95 p-3 group-hover:block">
-        <Sparkline series={series} />
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   const [dexRows, setDexRows] = useState<ProtocolRow[]>([]);
   const [coinRows, setCoinRows] = useState<CoinRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const [nowTs, setNowTs] = useState<number>(Date.now());
-  const [nextRefreshAt, setNextRefreshAt] = useState<number>(Date.now() + 1000);
+  const [nextRefreshAt, setNextRefreshAt] = useState<number>(Date.now() + 5000);
   const [activeTab, setActiveTab] = useState<'all' | 'exchanges' | 'coins'>('all');
 
   const fetchData = async (silent = false) => {
@@ -222,14 +191,14 @@ export default function Home() {
     } catch (e) {
       console.error('auto-refresh fetch failed', e);
     } finally {
-      setNextRefreshAt(Date.now() + 1000);
+      setNextRefreshAt(Date.now() + 5000);
       if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData(false);
-    const poll = setInterval(() => fetchData(true), 1000);
+    const poll = setInterval(() => fetchData(true), 5000);
     const ticker = setInterval(() => setNowTs(Date.now()), 1000);
     return () => {
       clearInterval(poll);
@@ -250,7 +219,7 @@ export default function Home() {
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨 흐름을 시각적으로 빠르게 확인하세요.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
-            <span className="text-slate-300">· 1초 자동 갱신</span>
+            <span className="text-slate-300">· 5초 자동 갱신</span>
             <span className="text-slate-300">· 마지막 업데이트 {secondsSinceUpdate == null ? '-' : `${secondsSinceUpdate}s 전`}</span>
             <span className="text-slate-300">· 다음 갱신 {Math.max(0, Math.ceil((nextRefreshAt - nowTs) / 1000))}s</span>
           </div>
@@ -281,13 +250,6 @@ export default function Home() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {!loading &&
                 dexRows.map((r) => {
-                  const volSeries = r.volume24h && r.tvlSeries.length
-                    ? r.tvlSeries.map((v) => (v / Math.max(r.tvl, 1)) * r.volume24h!)
-                    : r.tvlSeries;
-                  const changeSeries = r.tvlSeries.length > 1
-                    ? r.tvlSeries.map((v, i, a) => (i === 0 ? 0 : ((v - a[i - 1]) / Math.max(a[i - 1], 1)) * 100))
-                    : r.tvlSeries;
-
                   return (
                   <button
                     key={`${r.name}-${r.link}`}
@@ -302,11 +264,11 @@ export default function Home() {
                     <div className="mb-4 grid grid-cols-2 gap-3">
                       <div className="rounded-2xl bg-white/5 p-3">
                         <p className="text-[11px] text-slate-400">TVL</p>
-                        <p className="mt-1 text-base font-semibold"><HoverMetric value={r.tvl > 0 ? money(r.tvl) : '-'} series={r.tvlSeries} /></p>
+                        <p className="mt-1 text-base font-semibold"><span>{r.tvl > 0 ? money(r.tvl) : '-'}</span></p>
                       </div>
                       <div className="rounded-2xl bg-white/5 p-3">
                         <p className="text-[11px] text-slate-400">24H Vol</p>
-                        <p className="mt-1 text-base font-semibold"><HoverMetric value={r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'} series={volSeries} /></p>
+                        <p className="mt-1 text-base font-semibold"><span>{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</span></p>
                       </div>
                     </div>
 
@@ -314,7 +276,7 @@ export default function Home() {
                       <div className="mb-2 flex items-center justify-between text-sm">
                         <span className="text-slate-400">Momentum</span>
                         <span className={r.d1 != null && r.d1 >= 0 ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold'}>
-                          <HoverMetric value={`${p(r.d1)} / ${p(r.d7)}`} series={changeSeries} />
+                          <span>{`${p(r.d1)} / ${p(r.d7)}`}</span>
                         </span>
                       </div>
                       <div className="h-2 w-full rounded-full bg-white/10">
