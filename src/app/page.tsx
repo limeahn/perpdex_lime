@@ -108,6 +108,7 @@ export default function Home() {
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const [nowTs, setNowTs] = useState<number>(Date.now());
   const [nextRefreshAt, setNextRefreshAt] = useState<number>(Date.now() + 10000);
+  const [activeTab, setActiveTab] = useState<'all' | 'exchanges' | 'coins'>('all');
 
   const fetchData = async (silent = false) => {
     try {
@@ -266,7 +267,14 @@ export default function Home() {
           </div>
         </section>
 
+        <div className="mb-6 inline-flex rounded-xl border border-white/15 bg-white/5 p-1">
+          <button onClick={() => setActiveTab('all')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='all'?'bg-cyan-400/20 text-cyan-200':'text-slate-300'}`}>All</button>
+          <button onClick={() => setActiveTab('exchanges')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='exchanges'?'bg-cyan-400/20 text-cyan-200':'text-slate-300'}`}>Exchanges</button>
+          <button onClick={() => setActiveTab('coins')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='coins'?'bg-cyan-400/20 text-cyan-200':'text-slate-300'}`}>Coins</button>
+        </div>
+
         <section className="grid grid-cols-1 gap-8 xl:grid-cols-5">
+          {activeTab !== 'coins' && (
           <div className="xl:col-span-3 rounded-3xl border border-blue-300/20 bg-gradient-to-b from-blue-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
             <h2 className="mb-5 text-xl font-semibold">Exchange Cards</h2>
             {loading && <div className="text-slate-400">Loading...</div>}
@@ -312,7 +320,9 @@ export default function Home() {
                 })}
             </div>
           </div>
+          )}
 
+          {activeTab !== 'exchanges' && (
           <div className="xl:col-span-2 rounded-3xl border border-fuchsia-300/20 bg-gradient-to-b from-fuchsia-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
             <h2 className="mb-5 text-xl font-semibold">Coin Pulse</h2>
             <div className="space-y-3">
@@ -332,6 +342,7 @@ export default function Home() {
               ))}
             </div>
           </div>
+          )}
         </section>
       </div>
     </main>
