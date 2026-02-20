@@ -208,22 +208,25 @@ export default function Home() {
         </section>
 
         <section className="mt-14 grid grid-cols-1 lg:grid-cols-5 gap-10">
-          <div className="lg:col-span-2 rounded-[34px] bg-[#faf7ff] border-2 border-[#e6dcfb] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
-            <div className="mb-5 flex items-end justify-between">
-              <div><h2 className="text-xl font-bold">Perp DEX 랭킹</h2><p className="text-xs text-slate-500 mt-1">거래소별 유동성과 단기 추세</p></div>
-              <span className="text-xs text-slate-500">TVL / 1D / 7D</span>
+          <div className="lg:col-span-2">
+            <div className="mb-4 px-1">
+              <div className="flex items-end justify-between">
+                <div><h2 className="text-2xl font-bold">Perp DEX 랭킹</h2><p className="text-sm text-slate-500 mt-1">거래소별 유동성과 단기 추세</p></div>
+                <span className="text-sm text-slate-500">TVL / 1D / 7D</span>
+              </div>
             </div>
+            <div className="rounded-[34px] bg-[#faf7ff] border-2 border-[#e6dcfb] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <div className="space-y-5">
               {loading && [1, 2, 3].map((n) => <div key={n} className="h-20 rounded-[26px] bg-white/70 animate-pulse" />)}
               {!loading && dexRows.map((r, i) => (
-                <article key={r.slug} className="rounded-[26px] bg-white px-5 py-5 border border-[#e8edf5] shadow-[0_3px_10px_rgba(30,41,59,0.05)]">
+                <article key={r.slug} className="rounded-[26px] bg-white px-6 py-6 border border-[#e8edf5] shadow-[0_3px_10px_rgba(30,41,59,0.05)]">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-slate-400">#{i + 1}</p>
                       <p className="font-semibold text-[18px]">{r.name}</p>
                       <p className="text-xs text-slate-500 mt-1">{formatMoney(r.tvl)}</p>
                     </div>
-                    <div className="text-right text-sm leading-7">
+                    <div className="text-right text-sm leading-8">
                       <div className={tone(r.d1)}>1D {formatPct(r.d1)}</div>
                       <div className={tone(r.d7)}>7D {formatPct(r.d7)}</div>
                     </div>
@@ -232,14 +235,18 @@ export default function Home() {
               ))}
             </div>
           </div>
+          </div>
 
-          <div className="lg:col-span-3 rounded-[34px] bg-[#f8fcff] border-2 border-[#dbe9f8] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
-            <div className="mb-5 flex items-end justify-between">
-              <div><h2 className="text-xl font-bold">코인 마켓 스냅샷</h2><p className="text-xs text-slate-500 mt-1">가격 · 변동률 · 시총 비교</p></div>
-              <span className="text-xs text-slate-500">CMC + CoinGecko</span>
+          <div className="lg:col-span-3">
+            <div className="mb-4 px-1">
+              <div className="flex items-end justify-between">
+                <div><h2 className="text-2xl font-bold">코인 마켓 스냅샷</h2><p className="text-sm text-slate-500 mt-1">가격 · 변동률 · 시총 비교</p></div>
+                <span className="text-sm text-slate-500">CMC + CoinGecko</span>
+              </div>
             </div>
+            <div className="rounded-[34px] bg-[#f8fcff] border-2 border-[#dbe9f8] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm leading-8">
+              <table className="w-full text-sm leading-9">
                 <thead className="text-slate-400 border-b border-[#e2e8f0]">
                   <tr>
                     <th className="py-3 text-left font-medium">코인</th>
@@ -265,6 +272,7 @@ export default function Home() {
                 </tbody>
               </table>
             </div>
+          </div>
           </div>
         </section>
       </div>
