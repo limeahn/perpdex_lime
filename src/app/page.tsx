@@ -151,7 +151,7 @@ export default function Home() {
             })
           : [];
 
-        const merged = [...cmcCoins, ...geckoCoins].slice(0, 12);
+        const merged = [...cmcCoins, ...geckoCoins].slice(0, 8);
         setCoinRows(merged);
 
         if (!d.length && !merged.length) setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
@@ -175,7 +175,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#f7f9ff] to-[#f4f7fb] text-[#1b2430]">
-      <div className="mx-auto w-full max-w-[1140px] px-5 py-10 md:px-10 md:py-14">
+      <div className="mx-auto w-full max-w-[1040px] px-6 py-12 md:px-12 md:py-16">
         <header className="rounded-[40px] bg-white/85 backdrop-blur border border-[#e8eef8] shadow-[0_12px_30px_rgba(71,85,105,0.08)] p-8 md:p-10">
           <p className="text-sm font-semibold text-[#5b7cfa]">Perp Pulse</p>
           <h1 className="mt-3 text-3xl md:text-5xl font-bold leading-tight tracking-tight">
@@ -189,41 +189,41 @@ export default function Home() {
 
         {error && <div className="mt-6 rounded-[24px] bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
 
-        <section className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-7">
-          <article className="rounded-[34px] bg-[#ecf4ff] border-2 border-[#d7e6fb] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+        <section className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <article className="rounded-[34px] bg-[#ecf4ff] border-2 border-[#d7e6fb] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <p className="text-xs text-slate-500">Total TVL</p>
             <p className="mt-2 text-3xl font-bold">{formatMoney(totalTvl)}</p>
             <p className="mt-2 text-xs text-slate-500">DefiLlama Aggregate</p>
           </article>
-          <article className="rounded-[34px] bg-[#f4f0ff] border-2 border-[#e3d8fb] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+          <article className="rounded-[34px] bg-[#f4f0ff] border-2 border-[#e3d8fb] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <p className="text-xs text-slate-500">Avg DEX 24H</p>
             <p className={`mt-2 text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
             <p className="mt-2 text-xs text-slate-500">평균 1일 변화율</p>
           </article>
-          <article className="rounded-[34px] bg-[#effaf3] border-2 border-[#d5f0de] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+          <article className="rounded-[34px] bg-[#effaf3] border-2 border-[#d5f0de] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <p className="text-xs text-slate-500">Tracked DEX</p>
             <p className="mt-2 text-3xl font-bold">{dexRows.length}</p>
             <p className="mt-2 text-xs text-slate-500">GMX · dYdX · Hyperliquid · ApeX</p>
           </article>
         </section>
 
-        <section className="mt-11 grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-2 rounded-[34px] bg-[#faf7ff] border-2 border-[#e6dcfb] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+        <section className="mt-14 grid grid-cols-1 lg:grid-cols-5 gap-10">
+          <div className="lg:col-span-2 rounded-[34px] bg-[#faf7ff] border-2 border-[#e6dcfb] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <div className="mb-5 flex items-end justify-between">
-              <h2 className="text-xl font-bold">Perp DEX 랭킹</h2>
+              <div><h2 className="text-xl font-bold">Perp DEX 랭킹</h2><p className="text-xs text-slate-500 mt-1">거래소별 유동성과 단기 추세</p></div>
               <span className="text-xs text-slate-500">TVL / 1D / 7D</span>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {loading && [1, 2, 3].map((n) => <div key={n} className="h-20 rounded-[26px] bg-white/70 animate-pulse" />)}
               {!loading && dexRows.map((r, i) => (
                 <article key={r.slug} className="rounded-[26px] bg-white px-5 py-5 border border-[#e8edf5] shadow-[0_3px_10px_rgba(30,41,59,0.05)]">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-slate-400">#{i + 1}</p>
-                      <p className="font-semibold text-[17px]">{r.name}</p>
+                      <p className="font-semibold text-[18px]">{r.name}</p>
                       <p className="text-xs text-slate-500 mt-1">{formatMoney(r.tvl)}</p>
                     </div>
-                    <div className="text-right text-xs leading-6">
+                    <div className="text-right text-sm leading-7">
                       <div className={tone(r.d1)}>1D {formatPct(r.d1)}</div>
                       <div className={tone(r.d7)}>7D {formatPct(r.d7)}</div>
                     </div>
@@ -233,13 +233,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-3 rounded-[34px] bg-[#f8fcff] border-2 border-[#dbe9f8] p-7 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+          <div className="lg:col-span-3 rounded-[34px] bg-[#f8fcff] border-2 border-[#dbe9f8] p-8 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
             <div className="mb-5 flex items-end justify-between">
-              <h2 className="text-xl font-bold">코인 마켓 스냅샷</h2>
+              <div><h2 className="text-xl font-bold">코인 마켓 스냅샷</h2><p className="text-xs text-slate-500 mt-1">가격 · 변동률 · 시총 비교</p></div>
               <span className="text-xs text-slate-500">CMC + CoinGecko</span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm leading-7">
+              <table className="w-full text-sm leading-8">
                 <thead className="text-slate-400 border-b border-[#e2e8f0]">
                   <tr>
                     <th className="py-3 text-left font-medium">코인</th>
