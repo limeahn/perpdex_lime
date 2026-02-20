@@ -214,7 +214,7 @@ export default function Home() {
       <div className="relative mx-auto max-w-[1320px] px-6 py-10 md:px-10">
         <header className="mb-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-xl">
           <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Modern Perp Exchange Intelligence</h1>
-          <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서 확인하세요.</p>
+          <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨 흐름을 한 화면에서 확인하세요.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
             <span className="text-slate-300">· 10초 자동 갱신</span>
@@ -255,8 +255,6 @@ export default function Home() {
                       <p className="text-right">{r.tvl > 0 ? money(r.tvl) : '-'}</p>
                       <p className="text-slate-400">24H Vol</p>
                       <p className="text-right">{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</p>
-                      <p className="text-slate-400">Users</p>
-                      <p className="text-right">{users(r.users24h)}</p>
                       <p className="text-slate-400">1D / 7D</p>
                       <p className={`text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {p(r.d1)} <span className={r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}>/ {p(r.d7)}</span>
