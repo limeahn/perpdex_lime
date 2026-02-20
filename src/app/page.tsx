@@ -295,7 +295,7 @@ export default function Home() {
                     onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
                   >
                     <div className="mb-3 flex items-center justify-between">
-                      <p className="text-lg font-semibold">{r.name}</p>
+                      <p className="text-lg font-extrabold tracking-tight">{r.name}</p>
                       <span className="text-cyan-300 text-sm">Open ↗</span>
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -330,7 +330,7 @@ export default function Home() {
                 <div key={c.id} className="rounded-xl border border-white/10 bg-gradient-to-r from-sky-500/10 to-violet-500/10 p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{c.name}</p>
+                      <p className="font-bold">{c.name}</p>
                       <p className="text-xs text-slate-400">{c.symbol} · {c.source.toUpperCase()}</p>
                     </div>
                     <div className="text-right">
