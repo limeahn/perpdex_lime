@@ -32,6 +32,7 @@ const DEXES: Array<{ slug?: string; name: string; link: string }> = [
   { name: 'STANDX', link: 'https://standx.com/referral?code=lime' },
   { name: 'Pacifica', link: 'https://app.pacifica.fi?referral=lime' },
   { name: 'Ostium', link: 'https://app.ostium.com/trade?from=SPX&to=USD&ref=RJ1QP' },
+  { name: 'Backpack', link: 'https://backpack.exchange/refer/arch' },
 ];
 
 const n = (v: unknown) => (typeof v === 'number' ? v : Number(v) || 0);
