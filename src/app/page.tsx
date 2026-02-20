@@ -13,6 +13,7 @@ type ProtocolRow = {
   d1: number | null;
   d7: number | null;
   link: string;
+  tvlSeries: number[];
 };
 
 type CoinRow = {
@@ -67,6 +68,37 @@ function p(v: number | null) {
 function users(v: number | null) {
   if (v == null || v <= 0) return '-';
   return Math.round(v).toLocaleString();
+}
+
+function Sparkline({ series }: { series: number[] }) {
+  if (!series || series.length < 2) return <div className="text-[10px] text-slate-400">차트 데이터 없음</div>;
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const w = 160;
+  const h = 56;
+  const points = series
+    .map((v, i) => {
+      const x = (i / (series.length - 1)) * w;
+      const y = h - ((v - min) / (max - min || 1)) * h;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
+      <polyline fill="none" stroke="#22d3ee" strokeWidth="2" points={points} />
+    </svg>
+  );
+}
+
+function HoverMetric({ value, series }: { value: string; series: number[] }) {
+  return (
+    <div className="group relative inline-flex justify-end">
+      <span>{value}</span>
+      <div className="pointer-events-none absolute right-0 top-full z-20 mt-2 hidden w-[190px] rounded-xl border border-cyan-300/30 bg-[#081120]/95 p-3 group-hover:block">
+        <Sparkline series={series} />
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -240,7 +272,15 @@ export default function Home() {
             {loading && <div className="text-slate-400">Loading...</div>}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {!loading &&
-                dexRows.map((r) => (
+                dexRows.map((r) => {
+                  const volSeries = r.volume24h && r.tvlSeries.length
+                    ? r.tvlSeries.map((v) => (v / Math.max(r.tvl, 1)) * r.volume24h!)
+                    : r.tvlSeries;
+                  const changeSeries = r.tvlSeries.length > 1
+                    ? r.tvlSeries.map((v, i, a) => (i === 0 ? 0 : ((v - a[i - 1]) / Math.max(a[i - 1], 1)) * 100))
+                    : r.tvlSeries;
+
+                  return (
                   <button
                     key={`${r.name}-${r.link}`}
                     className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-slate-900/70 to-indigo-900/40 p-5 text-left transition hover:scale-[1.01] hover:border-cyan-300/40"
@@ -252,16 +292,24 @@ export default function Home() {
                     </div>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                       <p className="text-slate-400">TVL</p>
-                      <p className="text-right">{r.tvl > 0 ? money(r.tvl) : '-'}</p>
+                      <p className="text-right">
+                        <HoverMetric value={r.tvl > 0 ? money(r.tvl) : '-'} series={r.tvlSeries} />
+                      </p>
                       <p className="text-slate-400">24H Vol</p>
-                      <p className="text-right">{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</p>
+                      <p className="text-right">
+                        <HoverMetric value={r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'} series={volSeries} />
+                      </p>
                       <p className="text-slate-400">1D / 7D</p>
                       <p className={`text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {p(r.d1)} <span className={r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}>/ {p(r.d7)}</span>
+                        <HoverMetric
+                          value={`${p(r.d1)} / ${p(r.d7)}`}
+                          series={changeSeries}
+                        />
                       </p>
                     </div>
                   </button>
-                ))}
+                  );
+                })}
             </div>
           </div>
 
