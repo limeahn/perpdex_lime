@@ -177,32 +177,32 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#060912] text-slate-100">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(99,102,241,0.18),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(14,165,233,0.15),transparent_30%),radial-gradient(circle_at_50%_90%,rgba(168,85,247,0.12),transparent_35%)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(99,102,241,0.30),transparent_34%),radial-gradient(circle_at_85%_8%,rgba(6,182,212,0.28),transparent_30%),radial-gradient(circle_at_50%_92%,rgba(217,70,239,0.22),transparent_35%),radial-gradient(circle_at_30%_70%,rgba(16,185,129,0.16),transparent_28%)]" />
 
       <div className="relative mx-auto max-w-[1320px] px-6 py-10 md:px-10">
-        <header className="mb-8 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+        <header className="mb-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-xl">
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">LIME MARKET BOARD</p>
           <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Modern Perp Exchange Intelligence</h1>
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서. 거래소 클릭 시 바로 레퍼럴 링크로 이동합니다.</p>
         </header>
 
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-indigo-300/20 bg-gradient-to-br from-indigo-500/20 to-indigo-900/20 p-6 backdrop-blur">
+          <div className="rounded-2xl border border-indigo-300/30 bg-gradient-to-br from-indigo-400/30 via-blue-500/20 to-indigo-900/25 p-6 backdrop-blur">
             <p className="text-xs text-slate-300">Total TVL</p>
             <p className="mt-2 text-3xl font-semibold">{money(total)}</p>
           </div>
-          <div className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-cyan-500/20 to-cyan-900/20 p-6 backdrop-blur">
+          <div className="rounded-2xl border border-cyan-300/30 bg-gradient-to-br from-cyan-400/30 via-sky-500/20 to-cyan-900/25 p-6 backdrop-blur">
             <p className="text-xs text-slate-300">Tracked Exchanges</p>
             <p className="mt-2 text-3xl font-semibold">{dexRows.length}</p>
           </div>
-          <div className="rounded-2xl border border-fuchsia-300/20 bg-gradient-to-br from-fuchsia-500/20 to-fuchsia-900/20 p-6 backdrop-blur">
+          <div className="rounded-2xl border border-fuchsia-300/30 bg-gradient-to-br from-fuchsia-400/30 via-pink-500/20 to-fuchsia-900/25 p-6 backdrop-blur">
             <p className="text-xs text-slate-300">Top Exchange</p>
             <p className="mt-2 text-3xl font-semibold">{dexRows[0]?.name ?? '-'}</p>
           </div>
         </section>
 
         <section className="grid grid-cols-1 gap-8 xl:grid-cols-5">
-          <div className="xl:col-span-3 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+          <div className="xl:col-span-3 rounded-3xl border border-blue-300/20 bg-gradient-to-b from-blue-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
             <h2 className="mb-5 text-xl font-semibold">Exchange Metrics</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -227,7 +227,7 @@ export default function Home() {
                     dexRows.map((r) => (
                       <tr
                         key={`${r.name}-${r.link}`}
-                        className="cursor-pointer border-b border-white/5 transition hover:bg-white/[0.06]"
+                        className="cursor-pointer border-b border-white/5 transition hover:bg-cyan-300/[0.10]"
                         onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
                       >
                         <td className="py-4 font-medium">{r.name}</td>
@@ -244,11 +244,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="xl:col-span-2 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+          <div className="xl:col-span-2 rounded-3xl border border-fuchsia-300/20 bg-gradient-to-b from-fuchsia-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
             <h2 className="mb-5 text-xl font-semibold">Coin Pulse</h2>
             <div className="space-y-3">
               {coinRows.map((c) => (
-                <div key={c.id} className="rounded-xl border border-white/10 bg-black/20 p-4">
+                <div key={c.id} className="rounded-xl border border-cyan-200/20 bg-gradient-to-r from-cyan-500/10 to-violet-500/10 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{c.name}</p>
