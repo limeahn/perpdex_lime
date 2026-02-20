@@ -125,10 +125,9 @@ export default function Home() {
 
       const overviewProtocols: any[] = overviewRes?.data?.protocols ?? [];
       const pickOverview = (name: string, slug?: string) => {
-        const q = `${name} ${slug ?? ''}`.toLowerCase();
         const matched = overviewProtocols.filter((p) => {
           const hay = `${p?.displayName ?? ''} ${p?.name ?? ''} ${p?.slug ?? ''} ${p?.module ?? ''} ${(p?.linkedProtocols ?? []).join(' ')}`.toLowerCase();
-          return hay.includes(name.toLowerCase()) || (slug ? hay.includes(slug.toLowerCase()) : false) || (slug === 'dydx' && hay.includes('dydx'));
+          return hay.includes(name.toLowerCase()) || (slug ? hay.includes(slug.toLowerCase()) : false);
         });
         if (!matched.length) return null;
         return matched.sort((a, b) => n(b?.total24h) - n(a?.total24h))[0];
@@ -168,7 +167,7 @@ export default function Home() {
             source: 'cmc',
           }))
         : [];
-      setCoinRows([...cmc, ...gecko].slice(0, 10));
+      setCoinRows([...cmc, ...gecko].slice(0, 8));
       setLoading(false);
     };
     run();
@@ -177,35 +176,37 @@ export default function Home() {
   const total = useMemo(() => dexRows.reduce((s, r) => s + r.tvl, 0), [dexRows]);
 
   return (
-    <main className="min-h-screen bg-[#070b14] text-slate-100">
-      <div className="mx-auto max-w-[1280px] px-6 py-10 md:px-10">
-        <div className="mb-8 rounded-3xl border border-[#1c2433] bg-[#0d1423] px-7 py-8">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#67a2ff]">Exchanges</p>
-          <h1 className="mt-3 text-4xl font-semibold">Perpetual Exchanges Overview</h1>
-          <p className="mt-3 text-slate-400">다크 테마 기반의 거래소 데이터 보드</p>
-        </div>
+    <main className="min-h-screen bg-[#060912] text-slate-100">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(99,102,241,0.18),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(14,165,233,0.15),transparent_30%),radial-gradient(circle_at_50%_90%,rgba(168,85,247,0.12),transparent_35%)]" />
+
+      <div className="relative mx-auto max-w-[1320px] px-6 py-10 md:px-10">
+        <header className="mb-8 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+          <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">LIME MARKET BOARD</p>
+          <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Modern Perp Exchange Intelligence</h1>
+          <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서. 거래소 클릭 시 바로 레퍼럴 링크로 이동합니다.</p>
+        </header>
 
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-[#1f2a3b] bg-[#0c1220] p-6">
-            <p className="text-xs text-slate-400">Total TVL</p>
+          <div className="rounded-2xl border border-indigo-300/20 bg-gradient-to-br from-indigo-500/20 to-indigo-900/20 p-6 backdrop-blur">
+            <p className="text-xs text-slate-300">Total TVL</p>
             <p className="mt-2 text-3xl font-semibold">{money(total)}</p>
           </div>
-          <div className="rounded-2xl border border-[#1f2a3b] bg-[#0c1220] p-6">
-            <p className="text-xs text-slate-400">Tracked Exchanges</p>
+          <div className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-cyan-500/20 to-cyan-900/20 p-6 backdrop-blur">
+            <p className="text-xs text-slate-300">Tracked Exchanges</p>
             <p className="mt-2 text-3xl font-semibold">{dexRows.length}</p>
           </div>
-          <div className="rounded-2xl border border-[#1f2a3b] bg-[#0c1220] p-6">
-            <p className="text-xs text-slate-400">Top Exchange</p>
+          <div className="rounded-2xl border border-fuchsia-300/20 bg-gradient-to-br from-fuchsia-500/20 to-fuchsia-900/20 p-6 backdrop-blur">
+            <p className="text-xs text-slate-300">Top Exchange</p>
             <p className="mt-2 text-3xl font-semibold">{dexRows[0]?.name ?? '-'}</p>
           </div>
         </section>
 
-        <section className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          <div className="lg:col-span-3 rounded-3xl border border-[#1f2a3b] bg-[#0b111d] p-6">
-            <h2 className="mb-5 text-xl font-semibold">Perp Exchange Table</h2>
+        <section className="grid grid-cols-1 gap-8 xl:grid-cols-5">
+          <div className="xl:col-span-3 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+            <h2 className="mb-5 text-xl font-semibold">Exchange Metrics</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="border-b border-[#1f2a3b] text-slate-400">
+                <thead className="border-b border-white/10 text-slate-300">
                   <tr>
                     <th className="py-3 text-left">Exchange</th>
                     <th className="py-3 text-right">TVL</th>
@@ -219,14 +220,14 @@ export default function Home() {
                 <tbody>
                   {loading && (
                     <tr>
-                      <td className="py-6 text-slate-500" colSpan={7}>Loading...</td>
+                      <td className="py-6 text-slate-400" colSpan={7}>Loading...</td>
                     </tr>
                   )}
                   {!loading &&
                     dexRows.map((r) => (
                       <tr
                         key={`${r.name}-${r.link}`}
-                        className="border-b border-[#141c2a] cursor-pointer hover:bg-[#111a2a]"
+                        className="cursor-pointer border-b border-white/5 transition hover:bg-white/[0.06]"
                         onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
                       >
                         <td className="py-4 font-medium">{r.name}</td>
@@ -235,7 +236,7 @@ export default function Home() {
                         <td className="py-4 text-right">{users(r.users24h)}</td>
                         <td className={`py-4 text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d1)}</td>
                         <td className={`py-4 text-right ${r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d7)}</td>
-                        <td className="py-4 text-right text-[#67a2ff]">Open ↗</td>
+                        <td className="py-4 text-right text-cyan-300">Open ↗</td>
                       </tr>
                     ))}
                 </tbody>
@@ -243,17 +244,15 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="lg:col-span-2 rounded-3xl border border-[#1f2a3b] bg-[#0b111d] p-6">
-            <h2 className="mb-5 text-xl font-semibold">Coin Market</h2>
+          <div className="xl:col-span-2 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+            <h2 className="mb-5 text-xl font-semibold">Coin Pulse</h2>
             <div className="space-y-3">
               {coinRows.map((c) => (
-                <div key={c.id} className="rounded-xl border border-[#1b2536] bg-[#0f1626] p-4">
+                <div key={c.id} className="rounded-xl border border-white/10 bg-black/20 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{c.name}</p>
-                      <p className="text-xs text-slate-400">
-                        {c.symbol} · {c.source.toUpperCase()}
-                      </p>
+                      <p className="text-xs text-slate-400">{c.symbol} · {c.source.toUpperCase()}</p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium">{money(c.price)}</p>
