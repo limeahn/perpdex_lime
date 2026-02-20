@@ -214,44 +214,34 @@ export default function Home() {
 
         <section className="grid grid-cols-1 gap-8 xl:grid-cols-5">
           <div className="xl:col-span-3 rounded-3xl border border-blue-300/20 bg-gradient-to-b from-blue-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
-            <h2 className="mb-5 text-xl font-semibold">Exchange Metrics</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-white/10 text-slate-300">
-                  <tr>
-                    <th className="py-3 text-left">Exchange</th>
-                    <th className="py-3 text-right">TVL</th>
-                    <th className="py-3 text-right">24H Vol</th>
-                    <th className="py-3 text-right">Users</th>
-                    <th className="py-3 text-right">1D</th>
-                    <th className="py-3 text-right">7D</th>
-                    <th className="py-3 text-right">Link</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loading && (
-                    <tr>
-                      <td className="py-6 text-slate-400" colSpan={7}>Loading...</td>
-                    </tr>
-                  )}
-                  {!loading &&
-                    dexRows.map((r) => (
-                      <tr
-                        key={`${r.name}-${r.link}`}
-                        className="cursor-pointer border-b border-white/5 transition hover:bg-cyan-300/[0.10]"
-                        onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
-                      >
-                        <td className="py-4 font-medium">{r.name}</td>
-                        <td className="py-4 text-right">{r.tvl > 0 ? money(r.tvl) : '-'}</td>
-                        <td className="py-4 text-right">{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</td>
-                        <td className="py-4 text-right">{users(r.users24h)}</td>
-                        <td className={`py-4 text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d1)}</td>
-                        <td className={`py-4 text-right ${r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d7)}</td>
-                        <td className="py-4 text-right text-cyan-300">Open ↗</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+            <h2 className="mb-5 text-xl font-semibold">Exchange Cards</h2>
+            {loading && <div className="text-slate-400">Loading...</div>}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {!loading &&
+                dexRows.map((r) => (
+                  <button
+                    key={`${r.name}-${r.link}`}
+                    className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-slate-900/70 to-indigo-900/40 p-5 text-left transition hover:scale-[1.01] hover:border-cyan-300/40"
+                    onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-lg font-semibold">{r.name}</p>
+                      <span className="text-cyan-300 text-sm">Open ↗</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                      <p className="text-slate-400">TVL</p>
+                      <p className="text-right">{r.tvl > 0 ? money(r.tvl) : '-'}</p>
+                      <p className="text-slate-400">24H Vol</p>
+                      <p className="text-right">{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</p>
+                      <p className="text-slate-400">Users</p>
+                      <p className="text-right">{users(r.users24h)}</p>
+                      <p className="text-slate-400">1D / 7D</p>
+                      <p className={`text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {p(r.d1)} <span className={r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}>/ {p(r.d7)}</span>
+                      </p>
+                    </div>
+                  </button>
+                ))}
             </div>
           </div>
 
