@@ -73,118 +73,131 @@ export default function Home() {
   const [dexRows, setDexRows] = useState<ProtocolRow[]>([]);
   const [coinRows, setCoinRows] = useState<CoinRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
+  const [nowTs, setNowTs] = useState<number>(Date.now());
 
-  useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      const [overviewRes, dexSettled, geckoRes, cmcRes, backpackTickersRes] = await Promise.all([
-        axios.get('https://api.llama.fi/overview/derivatives?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true').catch(() => null),
-        Promise.allSettled(
-          DEXES.map(async (dex) => {
-            if (!dex.slug) {
-              return {
-                name: dex.name,
-                tvl: 0,
-                volume24h: null,
-                users24h: null,
-                d1: null,
-                d7: null,
-                link: dex.link,
-              } as ProtocolRow;
-            }
-            const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
-            const hist = normalizeHistorical((res.data as any).tvl);
-            const tvl = hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
+  const fetchData = async (silent = false) => {
+    if (!silent) setLoading(true);
+
+    const [overviewRes, dexSettled, geckoRes, cmcRes, backpackTickersRes] = await Promise.all([
+      axios.get('https://api.llama.fi/overview/derivatives?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true').catch(() => null),
+      Promise.allSettled(
+        DEXES.map(async (dex) => {
+          if (!dex.slug) {
             return {
-              slug: dex.slug,
-              name: (res.data as any).name ?? dex.name,
-              tvl,
+              name: dex.name,
+              tvl: 0,
               volume24h: null,
               users24h: null,
-              d1: pct(hist, 1),
-              d7: pct(hist, 7),
+              d1: null,
+              d7: null,
               link: dex.link,
             } as ProtocolRow;
-          }),
-        ),
-        axios.get('https://api.coingecko.com/api/v3/coins/markets', {
-          params: {
-            vs_currency: 'usd',
-            order: 'market_cap_desc',
-            per_page: 8,
-            page: 1,
-            sparkline: false,
-            price_change_percentage: '24h',
-          },
-        }),
-        axios.get('/api/market/cmc').catch(() => null),
-        axios.get('https://api.backpack.exchange/api/v1/tickers').catch(() => null),
-      ]);
-
-      const overviewProtocols: any[] = overviewRes?.data?.protocols ?? [];
-      const pickOverview = (name: string, slug?: string) => {
-        const matched = overviewProtocols.filter((p) => {
-          const hay = `${p?.displayName ?? ''} ${p?.name ?? ''} ${p?.slug ?? ''} ${p?.module ?? ''} ${(p?.linkedProtocols ?? []).join(' ')}`.toLowerCase();
-          return hay.includes(name.toLowerCase()) || (slug ? hay.includes(slug.toLowerCase()) : false);
-        });
-        if (!matched.length) return null;
-        return matched.sort((a, b) => n(b?.total24h) - n(a?.total24h))[0];
-      };
-
-      const backpackTickers: any[] = Array.isArray(backpackTickersRes?.data) ? backpackTickersRes.data : [];
-      const backpackPerpVolume24h = backpackTickers
-        .filter((t) => String(t?.symbol ?? '').includes('_PERP'))
-        .reduce((sum, t) => sum + n(t?.quoteVolume), 0);
-
-      const dex = dexSettled
-        .filter((r): r is PromiseFulfilledResult<ProtocolRow> => r.status === 'fulfilled')
-        .map((r) => {
-          if (r.value.name.toLowerCase() === 'backpack') {
-            return {
-              ...r.value,
-              volume24h: backpackPerpVolume24h > 0 ? backpackPerpVolume24h : null,
-              users24h: null,
-            };
           }
+          const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
+          const hist = normalizeHistorical((res.data as any).tvl);
+          const tvl = hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
+          return {
+            slug: dex.slug,
+            name: (res.data as any).name ?? dex.name,
+            tvl,
+            volume24h: null,
+            users24h: null,
+            d1: pct(hist, 1),
+            d7: pct(hist, 7),
+            link: dex.link,
+          } as ProtocolRow;
+        }),
+      ),
+      axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+        params: {
+          vs_currency: 'usd',
+          order: 'market_cap_desc',
+          per_page: 8,
+          page: 1,
+          sparkline: false,
+          price_change_percentage: '24h',
+        },
+      }),
+      axios.get('/api/market/cmc').catch(() => null),
+      axios.get('https://api.backpack.exchange/api/v1/tickers').catch(() => null),
+    ]);
 
-          const ov = pickOverview(r.value.name, r.value.slug);
+    const overviewProtocols: any[] = overviewRes?.data?.protocols ?? [];
+    const pickOverview = (name: string, slug?: string) => {
+      const matched = overviewProtocols.filter((p) => {
+        const hay = `${p?.displayName ?? ''} ${p?.name ?? ''} ${p?.slug ?? ''} ${p?.module ?? ''} ${(p?.linkedProtocols ?? []).join(' ')}`.toLowerCase();
+        return hay.includes(name.toLowerCase()) || (slug ? hay.includes(slug.toLowerCase()) : false);
+      });
+      if (!matched.length) return null;
+      return matched.sort((a, b) => n(b?.total24h) - n(a?.total24h))[0];
+    };
+
+    const backpackTickers: any[] = Array.isArray(backpackTickersRes?.data) ? backpackTickersRes.data : [];
+    const backpackPerpVolume24h = backpackTickers
+      .filter((t) => String(t?.symbol ?? '').includes('_PERP'))
+      .reduce((sum, t) => sum + n(t?.quoteVolume), 0);
+
+    const dex = dexSettled
+      .filter((r): r is PromiseFulfilledResult<ProtocolRow> => r.status === 'fulfilled')
+      .map((r) => {
+        if (r.value.name.toLowerCase() === 'backpack') {
           return {
             ...r.value,
-            volume24h: ov ? n(ov.total24h) : null,
-            users24h: ov ? n(ov.users24h ?? ov.uniqueUsers24h ?? ov.activeUsers24h) || null : null,
+            volume24h: backpackPerpVolume24h > 0 ? backpackPerpVolume24h : null,
+            users24h: null,
           };
-        })
-        .sort((a, b) => b.tvl - a.tvl);
-      setDexRows(dex);
+        }
 
-      const gecko: CoinRow[] = (geckoRes.data as any[]).map((c) => ({
-        id: `g-${c.id}`,
-        symbol: String(c.symbol).toUpperCase(),
-        name: c.name,
-        price: n(c.current_price),
-        change24h: n(c.price_change_percentage_24h),
-        marketCap: n(c.market_cap),
-        source: 'coingecko',
-      }));
-      const cmcRaw = cmcRes?.data?.data as any[] | undefined;
-      const cmc: CoinRow[] = Array.isArray(cmcRaw)
-        ? cmcRaw.map((c) => ({
-            id: `c-${c.id}`,
-            symbol: c.symbol,
-            name: c.name,
-            price: n(c.quote?.USD?.price),
-            change24h: n(c.quote?.USD?.percent_change_24h),
-            marketCap: n(c.quote?.USD?.market_cap),
-            source: 'cmc',
-          }))
-        : [];
-      setCoinRows([...cmc, ...gecko].slice(0, 8));
-      setLoading(false);
+        const ov = pickOverview(r.value.name, r.value.slug);
+        return {
+          ...r.value,
+          volume24h: ov ? n(ov.total24h) : null,
+          users24h: ov ? n(ov.users24h ?? ov.uniqueUsers24h ?? ov.activeUsers24h) || null : null,
+        };
+      })
+      .sort((a, b) => b.tvl - a.tvl);
+    setDexRows(dex);
+
+    const gecko: CoinRow[] = (geckoRes.data as any[]).map((c) => ({
+      id: `g-${c.id}`,
+      symbol: String(c.symbol).toUpperCase(),
+      name: c.name,
+      price: n(c.current_price),
+      change24h: n(c.price_change_percentage_24h),
+      marketCap: n(c.market_cap),
+      source: 'coingecko',
+    }));
+    const cmcRaw = cmcRes?.data?.data as any[] | undefined;
+    const cmc: CoinRow[] = Array.isArray(cmcRaw)
+      ? cmcRaw.map((c) => ({
+          id: `c-${c.id}`,
+          symbol: c.symbol,
+          name: c.name,
+          price: n(c.quote?.USD?.price),
+          change24h: n(c.quote?.USD?.percent_change_24h),
+          marketCap: n(c.quote?.USD?.market_cap),
+          source: 'cmc',
+        }))
+      : [];
+    setCoinRows([...cmc, ...gecko].slice(0, 8));
+
+    setLastUpdatedAt(Date.now());
+    if (!silent) setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData(false);
+    const poll = setInterval(() => fetchData(true), 30000);
+    const ticker = setInterval(() => setNowTs(Date.now()), 1000);
+    return () => {
+      clearInterval(poll);
+      clearInterval(ticker);
     };
-    run();
   }, []);
 
   const total = useMemo(() => dexRows.reduce((s, r) => s + r.tvl, 0), [dexRows]);
+  const secondsSinceUpdate = lastUpdatedAt ? Math.max(0, Math.floor((nowTs - lastUpdatedAt) / 1000)) : null;
 
   return (
     <main className="min-h-screen bg-[#060912] text-slate-100">
@@ -194,6 +207,11 @@ export default function Home() {
         <header className="mb-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-xl">
           <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Modern Perp Exchange Intelligence</h1>
           <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨·사용자 흐름을 한 화면에서 확인하세요.</p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
+            <span className="text-slate-300">· 30초 자동 갱신</span>
+            <span className="text-slate-300">· 마지막 업데이트 {secondsSinceUpdate == null ? '-' : `${secondsSinceUpdate}s 전`}</span>
+          </div>
         </header>
 
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
