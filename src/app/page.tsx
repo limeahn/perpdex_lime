@@ -4,14 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 
 type HistoricalPoint = { date: number; totalLiquidityUSD: number };
-type ProtocolRow = {
-  slug: string;
-  name: string;
-  tvl: number;
-  d1: number | null;
-  d7: number | null;
-};
-
+type ProtocolRow = { slug: string; name: string; tvl: number; d1: number | null; d7: number | null };
 type CoinRow = {
   id: string;
   symbol: string;
@@ -29,250 +22,171 @@ const DEXES = [
   { slug: 'apex-protocol', name: 'ApeX' },
 ];
 
-function toNumber(v: unknown): number {
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (typeof v === 'string') {
-    const n = Number(v);
-    if (Number.isFinite(n)) return n;
-  }
-  return 0;
-}
+const n = (v: unknown) => (typeof v === 'number' ? v : Number(v) || 0);
 
 function normalizeHistorical(input: unknown): HistoricalPoint[] {
   if (!Array.isArray(input)) return [];
   return input
-    .map((row) => {
-      const r = row as Record<string, unknown>;
-      return {
-        date: toNumber(r.date),
-        totalLiquidityUSD: toNumber(r.totalLiquidityUSD ?? r.tvl),
-      };
-    })
-    .filter((x) => x.date > 0 && x.totalLiquidityUSD >= 0)
+    .map((r) => ({ date: n((r as any).date), totalLiquidityUSD: n((r as any).totalLiquidityUSD ?? (r as any).tvl) }))
+    .filter((x) => x.date > 0)
     .sort((a, b) => a.date - b.date);
 }
 
 function pct(points: HistoricalPoint[], days: number): number | null {
   if (!points.length) return null;
   const latest = points[points.length - 1];
-  const targetTs = latest.date - days * 86400;
-  const prev = [...points].reverse().find((p) => p.date <= targetTs);
+  const prev = [...points].reverse().find((p) => p.date <= latest.date - days * 86400);
   if (!prev || !prev.totalLiquidityUSD) return null;
   return ((latest.totalLiquidityUSD - prev.totalLiquidityUSD) / prev.totalLiquidityUSD) * 100;
 }
 
-function formatMoney(v: number): string {
-  if (v >= 1_000_000_000) return `$${(v / 1_000_000_000).toFixed(2)}B`;
-  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`;
-  if (v >= 1_000) return `$${(v / 1_000).toFixed(2)}K`;
+function money(v: number) {
+  if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
+  if (v >= 1e6) return `$${(v / 1e6).toFixed(2)}M`;
+  if (v >= 1e3) return `$${(v / 1e3).toFixed(2)}K`;
   return `$${Math.round(v).toLocaleString()}`;
 }
 
-function formatPct(v: number | null): string {
+function p(v: number | null) {
   if (v == null) return '-';
   return `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
-}
-
-function tone(v: number | null): string {
-  if (v == null) return 'text-slate-400';
-  return v >= 0 ? 'text-emerald-600' : 'text-rose-500';
 }
 
 export default function Home() {
   const [dexRows, setDexRows] = useState<ProtocolRow[]>([]);
   const [coinRows, setCoinRows] = useState<CoinRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAll = async () => {
+    const run = async () => {
       setLoading(true);
-      setError(null);
-
-      try {
-        const [dexSettled, geckoRes, cmcRes] = await Promise.all([
-          Promise.allSettled(
-            DEXES.map(async (dex) => {
-              const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
-              const p = res.data as Record<string, unknown>;
-              const hist = normalizeHistorical(p.tvl);
-              const latest = hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
-              return {
-                slug: dex.slug,
-                name: String(p.name ?? dex.name),
-                tvl: latest,
-                d1: pct(hist, 1),
-                d7: pct(hist, 7),
-              } satisfies ProtocolRow;
-            }),
-          ),
-          axios.get('https://api.coingecko.com/api/v3/coins/markets', {
-            params: {
-              vs_currency: 'usd',
-              order: 'market_cap_desc',
-              per_page: 8,
-              page: 1,
-              sparkline: false,
-              price_change_percentage: '24h',
-            },
+      const [dexSettled, geckoRes, cmcRes] = await Promise.all([
+        Promise.allSettled(
+          DEXES.map(async (dex) => {
+            const res = await axios.get(`https://api.llama.fi/protocol/${dex.slug}`);
+            const hist = normalizeHistorical((res.data as any).tvl);
+            const tvl = hist.length ? hist[hist.length - 1].totalLiquidityUSD : 0;
+            return { slug: dex.slug, name: (res.data as any).name ?? dex.name, tvl, d1: pct(hist, 1), d7: pct(hist, 7) };
           }),
-          axios.get('/api/market/cmc').catch(() => null),
-        ]);
+        ),
+        axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+          params: {
+            vs_currency: 'usd',
+            order: 'market_cap_desc',
+            per_page: 8,
+            page: 1,
+            sparkline: false,
+            price_change_percentage: '24h',
+          },
+        }),
+        axios.get('/api/market/cmc').catch(() => null),
+      ]);
 
-        const d = dexSettled
-          .filter((r): r is PromiseFulfilledResult<ProtocolRow> => r.status === 'fulfilled')
-          .map((r) => r.value)
-          .sort((a, b) => b.tvl - a.tvl);
-        setDexRows(d);
+      const dex = dexSettled
+        .filter((r): r is PromiseFulfilledResult<ProtocolRow> => r.status === 'fulfilled')
+        .map((r) => r.value)
+        .sort((a, b) => b.tvl - a.tvl);
+      setDexRows(dex);
 
-        const geckoCoins: CoinRow[] = (geckoRes.data as Record<string, unknown>[]).map((c) => ({
-          id: `gecko-${String(c.id)}`,
-          symbol: String(c.symbol).toUpperCase(),
-          name: String(c.name),
-          price: toNumber(c.current_price),
-          change24h: toNumber(c.price_change_percentage_24h),
-          marketCap: toNumber(c.market_cap),
-          source: 'coingecko',
-        }));
-
-        const cmcRaw = cmcRes?.data?.data as Record<string, unknown>[] | undefined;
-        const cmcCoins: CoinRow[] = Array.isArray(cmcRaw)
-          ? cmcRaw.map((c) => {
-              const q = (c.quote as Record<string, unknown>)?.USD as Record<string, unknown>;
-              return {
-                id: `cmc-${String(c.id)}`,
-                symbol: String(c.symbol),
-                name: String(c.name),
-                price: toNumber(q?.price),
-                change24h: toNumber(q?.percent_change_24h),
-                marketCap: toNumber(q?.market_cap),
-                source: 'cmc',
-              };
-            })
-          : [];
-
-        const merged = [...cmcCoins, ...geckoCoins].slice(0, 8);
-        setCoinRows(merged);
-
-        if (!d.length && !merged.length) setError('데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-      } catch (e) {
-        console.error(e);
-        setError('일부 데이터 소스 연결에 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
+      const gecko: CoinRow[] = (geckoRes.data as any[]).map((c) => ({
+        id: `g-${c.id}`,
+        symbol: String(c.symbol).toUpperCase(),
+        name: c.name,
+        price: n(c.current_price),
+        change24h: n(c.price_change_percentage_24h),
+        marketCap: n(c.market_cap),
+        source: 'coingecko',
+      }));
+      const cmcRaw = cmcRes?.data?.data as any[] | undefined;
+      const cmc: CoinRow[] = Array.isArray(cmcRaw)
+        ? cmcRaw.map((c) => ({
+            id: `c-${c.id}`,
+            symbol: c.symbol,
+            name: c.name,
+            price: n(c.quote?.USD?.price),
+            change24h: n(c.quote?.USD?.percent_change_24h),
+            marketCap: n(c.quote?.USD?.market_cap),
+            source: 'cmc',
+          }))
+        : [];
+      setCoinRows([...cmc, ...gecko].slice(0, 10));
+      setLoading(false);
     };
-
-    fetchAll();
+    run();
   }, []);
 
-  const totalTvl = useMemo(() => dexRows.reduce((sum, r) => sum + r.tvl, 0), [dexRows]);
-  const avgDex1d = useMemo(() => {
-    const vals = dexRows.map((d) => d.d1).filter((v): v is number => v !== null);
-    if (!vals.length) return null;
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
-  }, [dexRows]);
+  const total = useMemo(() => dexRows.reduce((s, r) => s + r.tvl, 0), [dexRows]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#f7f9ff] to-[#f4f7fb] text-[#1b2430]">
-      <div className="mx-auto w-full max-w-[1240px] px-7 py-14 md:px-16 md:py-20">
-        <header className="rounded-[40px] bg-white/85 backdrop-blur border border-[#e8eef8] shadow-[0_12px_30px_rgba(71,85,105,0.08)] p-8 md:p-10">
-          <p className="text-sm font-semibold text-[#5b7cfa]">Perp Pulse</p>
-          <h1 className="mt-3 text-3xl md:text-5xl font-bold leading-tight tracking-tight">
-            더 보기 좋고,
-            <br className="hidden md:block" /> 더 빠르게 읽히는 시장 대시보드
-          </h1>
-          <p className="mt-4 text-sm md:text-base text-slate-500 max-w-3xl">
-            Toss 감성의 말랑한 UI에 핵심 지표만 담았습니다. TVL, DEX 변화율, 코인 시황을 한 화면에서 확인해요.
-          </p>
-        </header>
+    <main className="min-h-screen bg-[#070b14] text-slate-100">
+      <div className="mx-auto max-w-[1280px] px-6 py-10 md:px-10">
+        <div className="mb-8 rounded-3xl border border-[#1c2433] bg-[#0d1423] px-7 py-8">
+          <p className="text-xs uppercase tracking-[0.2em] text-[#67a2ff]">Exchanges</p>
+          <h1 className="mt-3 text-4xl font-semibold">Perpetual Exchanges Overview</h1>
+          <p className="mt-3 text-slate-400">ReboundX 스타일 참고 · 다크 테마 거래소 보드</p>
+        </div>
 
-        {error && <div className="mt-6 rounded-[24px] bg-rose-50 p-4 text-sm text-rose-700">{error}</div>}
-
-        <section className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-12">
-          <article className="rounded-[40px] bg-[#ecf4ff] border-2 border-[#d7e6fb] p-10 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
-            <p className="text-xs text-slate-500">Total TVL</p>
-            <p className="mt-2 text-3xl font-bold">{formatMoney(totalTvl)}</p>
-            <p className="mt-2 text-xs text-slate-500">DefiLlama Aggregate</p>
-          </article>
-          <article className="rounded-[40px] bg-[#f4f0ff] border-2 border-[#e3d8fb] p-10 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
-            <p className="text-xs text-slate-500">Avg DEX 24H</p>
-            <p className={`mt-2 text-3xl font-bold ${tone(avgDex1d)}`}>{formatPct(avgDex1d)}</p>
-            <p className="mt-2 text-xs text-slate-500">평균 1일 변화율</p>
-          </article>
-          <article className="rounded-[40px] bg-[#effaf3] border-2 border-[#d5f0de] p-10 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
-            <p className="text-xs text-slate-500">Tracked DEX</p>
-            <p className="mt-2 text-3xl font-bold">{dexRows.length}</p>
-            <p className="mt-2 text-xs text-slate-500">GMX · dYdX · Hyperliquid · ApeX</p>
-          </article>
+        <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-[#1f2a3b] bg-[#0c1220] p-6">
+            <p className="text-xs text-slate-400">Total TVL</p>
+            <p className="mt-2 text-3xl font-semibold">{money(total)}</p>
+          </div>
+          <div className="rounded-2xl border border-[#1f2a3b] bg-[#0c1220] p-6">
+            <p className="text-xs text-slate-400">Tracked Exchanges</p>
+            <p className="mt-2 text-3xl font-semibold">{dexRows.length}</p>
+          </div>
+          <div className="rounded-2xl border border-[#1f2a3b] bg-[#0c1220] p-6">
+            <p className="text-xs text-slate-400">Top Exchange</p>
+            <p className="mt-2 text-3xl font-semibold">{dexRows[0]?.name ?? '-'}</p>
+          </div>
         </section>
 
-        <section className="mt-16 grid grid-cols-1 lg:grid-cols-5 gap-14">
-          <div className="lg:col-span-2">
-            <div className="mb-8 px-2">
-              <div className="flex items-end justify-between">
-                <div><h2 className="text-3xl font-bold">Perp DEX 랭킹</h2><p className="text-sm text-slate-500 mt-1">거래소별 유동성과 단기 추세</p></div>
-                <span className="text-sm text-slate-500">TVL / 1D / 7D</span>
-              </div>
-            </div>
-            <div className="rounded-[40px] bg-[#faf7ff] border-2 border-[#e6dcfb] p-10 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
-            <div className="space-y-7">
-              {loading && [1, 2, 3].map((n) => <div key={n} className="h-20 rounded-[32px] bg-white/70 animate-pulse" />)}
-              {!loading && dexRows.map((r, i) => (
-                <article key={r.slug} className="rounded-[32px] bg-white px-8 py-8 border border-[#e8edf5] shadow-[0_3px_10px_rgba(30,41,59,0.05)]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs text-slate-400">#{i + 1}</p>
-                      <p className="font-semibold text-[18px]">{r.name}</p>
-                      <p className="text-xs text-slate-500 mt-1">{formatMoney(r.tvl)}</p>
-                    </div>
-                    <div className="text-right text-base leading-9">
-                      <div className={tone(r.d1)}>1D {formatPct(r.d1)}</div>
-                      <div className={tone(r.d7)}>7D {formatPct(r.d7)}</div>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-          </div>
-
-          <div className="lg:col-span-3">
-            <div className="mb-8 px-2">
-              <div className="flex items-end justify-between">
-                <div><h2 className="text-3xl font-bold">코인 마켓 스냅샷</h2><p className="text-sm text-slate-500 mt-1">가격 · 변동률 · 시총 비교</p></div>
-                <span className="text-sm text-slate-500">CMC + CoinGecko</span>
-              </div>
-            </div>
-            <div className="rounded-[40px] bg-[#f8fcff] border-2 border-[#dbe9f8] p-10 shadow-[0_10px_24px_rgba(30,41,59,0.08)]">
+        <section className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          <div className="lg:col-span-3 rounded-3xl border border-[#1f2a3b] bg-[#0b111d] p-6">
+            <h2 className="mb-5 text-xl font-semibold">Perp Exchange Table</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-base leading-10">
-                <thead className="text-slate-400 border-b border-[#e2e8f0]">
+              <table className="w-full text-sm">
+                <thead className="border-b border-[#1f2a3b] text-slate-400">
                   <tr>
-                    <th className="py-3 text-left font-medium">코인</th>
-                    <th className="py-3 text-right font-medium">가격</th>
-                    <th className="py-3 text-right font-medium">24H</th>
-                    <th className="py-3 text-right font-medium">시가총액</th>
-                    <th className="py-3 text-right font-medium">출처</th>
+                    <th className="py-3 text-left">Exchange</th>
+                    <th className="py-3 text-right">TVL</th>
+                    <th className="py-3 text-right">1D</th>
+                    <th className="py-3 text-right">7D</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {coinRows.map((c) => (
-                    <tr key={c.id} className="border-b border-[#e8edf4]">
-                      <td className="py-5">
-                        <p className="font-semibold leading-5">{c.name}</p>
-                        <p className="text-xs text-slate-400">{c.symbol}</p>
-                      </td>
-                      <td className="py-5 text-right font-semibold">{formatMoney(c.price)}</td>
-                      <td className={`py-5 text-right font-semibold ${tone(c.change24h)}`}>{formatPct(c.change24h)}</td>
-                      <td className="py-5 text-right">{formatMoney(c.marketCap)}</td>
-                      <td className="py-5 text-right text-xs text-slate-400 uppercase">{c.source}</td>
+                  {loading && <tr><td className="py-6 text-slate-500" colSpan={4}>Loading...</td></tr>}
+                  {!loading && dexRows.map((r) => (
+                    <tr key={r.slug} className="border-b border-[#141c2a]">
+                      <td className="py-4 font-medium">{r.name}</td>
+                      <td className="py-4 text-right">{money(r.tvl)}</td>
+                      <td className={`py-4 text-right ${r.d1 != null && r.d1 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d1)}</td>
+                      <td className={`py-4 text-right ${r.d7 != null && r.d7 >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>{p(r.d7)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
+
+          <div className="lg:col-span-2 rounded-3xl border border-[#1f2a3b] bg-[#0b111d] p-6">
+            <h2 className="mb-5 text-xl font-semibold">Coin Market</h2>
+            <div className="space-y-3">
+              {coinRows.map((c) => (
+                <div key={c.id} className="rounded-xl border border-[#1b2536] bg-[#0f1626] p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{c.name}</p>
+                      <p className="text-xs text-slate-400">{c.symbol} · {c.source.toUpperCase()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{money(c.price)}</p>
+                      <p className={c.change24h >= 0 ? 'text-emerald-400 text-sm' : 'text-rose-400 text-sm'}>{p(c.change24h)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </div>
