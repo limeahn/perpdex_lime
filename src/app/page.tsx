@@ -123,7 +123,7 @@ export default function Home() {
         <div className="mb-8 rounded-3xl border border-[#1c2433] bg-[#0d1423] px-7 py-8">
           <p className="text-xs uppercase tracking-[0.2em] text-[#67a2ff]">Exchanges</p>
           <h1 className="mt-3 text-4xl font-semibold">Perpetual Exchanges Overview</h1>
-          <p className="mt-3 text-slate-400">ReboundX 스타일 참고 · 다크 테마 거래소 보드</p>
+          <p className="mt-3 text-slate-400">다크 테마 기반의 거래소 데이터 보드</p>
         </div>
 
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
