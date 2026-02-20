@@ -241,13 +241,13 @@ export default function Home() {
   const secondsSinceUpdate = lastUpdatedAt ? Math.max(0, Math.floor((nowTs - lastUpdatedAt) / 1000)) : null;
 
   return (
-    <main className="min-h-screen bg-[#060912] text-slate-100">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(99,102,241,0.30),transparent_34%),radial-gradient(circle_at_85%_8%,rgba(6,182,212,0.28),transparent_30%),radial-gradient(circle_at_50%_92%,rgba(217,70,239,0.22),transparent_35%),radial-gradient(circle_at_30%_70%,rgba(16,185,129,0.16),transparent_28%)]" />
+    <main className="min-h-screen bg-[#070a12] text-slate-100">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(56,189,248,0.20),transparent_34%),radial-gradient(circle_at_85%_10%,rgba(99,102,241,0.20),transparent_30%),radial-gradient(circle_at_50%_90%,rgba(217,70,239,0.14),transparent_36%)]" />
 
       <div className="relative mx-auto max-w-[1320px] px-6 py-10 md:px-10">
-        <header className="mb-8 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-8 backdrop-blur-xl">
-          <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Modern Perp Exchange Intelligence</h1>
-          <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨 흐름을 한 화면에서 확인하세요.</p>
+        <header className="mb-8 rounded-3xl border border-white/10 bg-[#0d1322]/85 p-7 md:p-8 backdrop-blur-xl">
+          <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Perp Market Intelligence</h1>
+          <p className="mt-3 max-w-3xl text-slate-300/90">실시간 TVL·볼륨 흐름을 시각적으로 빠르게 확인하세요.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
             <span className="text-slate-300">· 10초 자동 갱신</span>
@@ -273,9 +273,9 @@ export default function Home() {
           <button onClick={() => setActiveTab('coins')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='coins'?'bg-cyan-400/20 text-cyan-200':'text-slate-300'}`}>Coins</button>
         </div>
 
-        <section className="grid grid-cols-1 gap-8 xl:grid-cols-5">
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-5">
           {activeTab !== 'coins' && (
-          <div className="xl:col-span-3 rounded-3xl border border-blue-300/20 bg-gradient-to-b from-blue-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
+          <div className="xl:col-span-3 rounded-[24px] border border-white/10 bg-[#0c1220]/90 p-6 backdrop-blur-xl">
             <h2 className="mb-5 text-xl font-semibold">Exchange Cards</h2>
             {loading && <div className="text-slate-400">Loading...</div>}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -291,7 +291,7 @@ export default function Home() {
                   return (
                   <button
                     key={`${r.name}-${r.link}`}
-                    className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-slate-900/70 to-indigo-900/40 p-5 text-left transition hover:scale-[1.01] hover:border-cyan-300/40"
+                    className="rounded-2xl border border-cyan-300/20 bg-gradient-to-br from-slate-900/70 to-indigo-900/40 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-300/40"
                     onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
                   >
                     <div className="mb-3 flex items-center justify-between">
@@ -323,11 +323,11 @@ export default function Home() {
           )}
 
           {activeTab !== 'exchanges' && (
-          <div className="xl:col-span-2 rounded-3xl border border-fuchsia-300/20 bg-gradient-to-b from-fuchsia-500/10 to-indigo-900/10 p-6 backdrop-blur-xl">
+          <div className="xl:col-span-2 rounded-[24px] border border-white/10 bg-[#0c1220]/90 p-6 backdrop-blur-xl">
             <h2 className="mb-5 text-xl font-semibold">Coin Pulse</h2>
             <div className="space-y-3">
               {coinRows.map((c) => (
-                <div key={c.id} className="rounded-xl border border-cyan-200/20 bg-gradient-to-r from-cyan-500/10 to-violet-500/10 p-4">
+                <div key={c.id} className="rounded-xl border border-white/10 bg-gradient-to-r from-sky-500/10 to-violet-500/10 p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{c.name}</p>
