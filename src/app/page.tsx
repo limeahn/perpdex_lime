@@ -210,13 +210,13 @@ export default function Home() {
   const secondsSinceUpdate = lastUpdatedAt ? Math.max(0, Math.floor((nowTs - lastUpdatedAt) / 1000)) : null;
 
   return (
-    <main className="min-h-screen bg-[#f4f6fb] text-[#191f28]">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_12%_12%,rgba(56,189,248,0.20),transparent_34%),radial-gradient(circle_at_85%_10%,rgba(99,102,241,0.20),transparent_30%),radial-gradient(circle_at_50%_90%,rgba(217,70,239,0.14),transparent_36%)]" />
+    <main className="min-h-screen bg-[#f2f4f6] text-[#191f28]">
+      <div className="pointer-events-none fixed inset-0 bg-transparent" />
 
       <div className="relative mx-auto max-w-[1320px] px-6 py-10 md:px-10">
-        <header className="mb-8 rounded-3xl border border-[#e7eef8] bg-white p-7 md:p-8 backdrop-blur-xl">
-          <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Perp Market Intelligence</h1>
-          <p className="mt-3 max-w-3xl text-slate-500">실시간 TVL·볼륨 흐름을 시각적으로 빠르게 확인하세요.</p>
+        <header className="mb-8 rounded-[32px] border border-[#e8eef5] bg-white p-7 md:p-10 shadow-[0_2px_16px_rgba(15,23,42,0.05)]">
+          <h1 className="mt-3 text-3xl font-semibold md:text-5xl">Perpetual DEX 대시보드</h1>
+          <p className="mt-3 max-w-3xl text-slate-500">토스 스타일로 정리된 카드에서 핵심 지표를 빠르게 확인하세요.</p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#d7e8ff] bg-[#f1f7ff] px-3 py-1 text-xs text-[#2563eb]">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" /> LIVE
             <span className="text-slate-500">· 5초 자동 갱신</span>
@@ -226,17 +226,17 @@ export default function Home() {
         </header>
 
         <section className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#dbe8ff] bg-white p-6 backdrop-blur">
+          <div className="rounded-[24px] border border-[#e6edf5] bg-white p-6 shadow-[0_1px_8px_rgba(15,23,42,0.04)]">
             <p className="text-xs text-slate-500">Total TVL</p>
             <p className="mt-2 text-3xl font-semibold">{money(total)}</p>
           </div>
-          <div className="rounded-2xl border border-[#dbe8ff] bg-white p-6 backdrop-blur">
+          <div className="rounded-[24px] border border-[#e6edf5] bg-white p-6 shadow-[0_1px_8px_rgba(15,23,42,0.04)]">
             <p className="text-xs text-slate-500">Tracked Exchanges</p>
             <p className="mt-2 text-3xl font-semibold">{dexRows.length}</p>
           </div>
         </section>
 
-        <div className="mb-6 inline-flex rounded-2xl border border-[#dbe8ff] bg-white p-1">
+        <div className="mb-6 inline-flex rounded-2xl border border-[#e6edf5] bg-white p-1 shadow-[0_1px_8px_rgba(15,23,42,0.04)]">
           <button onClick={() => setActiveTab('all')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='all'?'bg-[#3182f6] text-white':'text-slate-500'}`}>All</button>
           <button onClick={() => setActiveTab('exchanges')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='exchanges'?'bg-[#3182f6] text-white':'text-slate-500'}`}>Exchanges</button>
           <button onClick={() => setActiveTab('coins')} className={`rounded-lg px-4 py-2 text-sm ${activeTab==='coins'?'bg-[#3182f6] text-white':'text-slate-500'}`}>Coins</button>
@@ -244,8 +244,8 @@ export default function Home() {
 
         <section className="grid grid-cols-1 gap-6 xl:grid-cols-5">
           {activeTab !== 'coins' && (
-          <div className="xl:col-span-3 rounded-[28px] border border-[#e6edf7] bg-white p-6 backdrop-blur-xl">
-            <h2 className="mb-5 text-xl font-semibold">Exchange Cards</h2>
+          <div className="xl:col-span-3 rounded-[28px] border border-[#e6edf5] bg-white p-6 shadow-[0_1px_10px_rgba(15,23,42,0.04)]">
+            <h2 className="mb-5 text-xl font-semibold">거래소 카드</h2>
             {loading && <div className="text-slate-400">Loading...</div>}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {!loading &&
@@ -253,7 +253,7 @@ export default function Home() {
                   return (
                   <button
                     key={`${r.name}-${r.link}`}
-                    className="group rounded-3xl border border-[#e6edf7] bg-[#f8fbff] p-5 text-left transition hover:-translate-y-1 hover:border-[#bfd7ff] hover:shadow-[0_10px_24px_rgba(37,99,235,0.12)]"
+                    className="group rounded-3xl border border-[#e6edf5] bg-[#fbfcfe] p-5 text-left transition hover:-translate-y-1 hover:border-[#cddcf3] hover:shadow-[0_8px_20px_rgba(15,23,42,0.08)]"
                     onClick={() => window.open(r.link, '_blank', 'noopener,noreferrer')}
                   >
                     <div className="mb-4 flex items-center justify-between">
@@ -262,17 +262,17 @@ export default function Home() {
                     </div>
 
                     <div className="mb-4 grid grid-cols-2 gap-3">
-                      <div className="rounded-2xl bg-white p-3">
+                      <div className="rounded-2xl bg-[#ffffff] p-3">
                         <p className="text-[11px] text-slate-400">TVL</p>
                         <p className="mt-1 text-base font-semibold"><span>{r.tvl > 0 ? money(r.tvl) : '-'}</span></p>
                       </div>
-                      <div className="rounded-2xl bg-white p-3">
+                      <div className="rounded-2xl bg-[#ffffff] p-3">
                         <p className="text-[11px] text-slate-400">24H Vol</p>
                         <p className="mt-1 text-base font-semibold"><span>{r.volume24h != null && r.volume24h > 0 ? money(r.volume24h) : '-'}</span></p>
                       </div>
                     </div>
 
-                    <div className="rounded-2xl bg-white p-3">
+                    <div className="rounded-2xl bg-[#ffffff] p-3">
                       <div className="mb-2 flex items-center justify-between text-sm">
                         <span className="text-slate-400">Momentum</span>
                         <span className={r.d1 != null && r.d1 >= 0 ? 'text-emerald-600 font-semibold' : 'text-rose-500 font-semibold'}>
@@ -294,8 +294,8 @@ export default function Home() {
           )}
 
           {activeTab !== 'exchanges' && (
-          <div className="xl:col-span-2 rounded-[28px] border border-[#e6edf7] bg-white p-6 backdrop-blur-xl">
-            <h2 className="mb-5 text-xl font-semibold">Coin Pulse</h2>
+          <div className="xl:col-span-2 rounded-[28px] border border-[#e6edf5] bg-white p-6 shadow-[0_1px_10px_rgba(15,23,42,0.04)]">
+            <h2 className="mb-5 text-xl font-semibold">코인 마켓</h2>
             <div className="space-y-3">
               {coinRows.map((c) => (
                 <div key={c.id} className="rounded-2xl border border-[#e6edf7] bg-[#f8fbff] p-4">
